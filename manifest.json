@@ -1,0 +1,16 @@
+{
+  "short_name": "MFG Dashboard",
+  "name": "MFG Dashboard - Live Manufacturing Tracking",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#667eea",
+  "background_color": "#764ba2",
+  "orientation": "landscape-primary"
+}
