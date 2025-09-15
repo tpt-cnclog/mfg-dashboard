@@ -241,7 +241,7 @@ const Dashboard = () => {
             <div className="header-left">
               <div className="logo-container">
                 <img 
-                  src="/company-logo.png" 
+                  src={`${process.env.PUBLIC_URL}/company-logo.png`}
                   alt="Company Logo" 
                   className="dashboard-logo"
                   onError={(e) => {
