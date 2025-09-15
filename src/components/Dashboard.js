@@ -12,6 +12,7 @@ const Dashboard = () => {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isIdle, setIsIdle] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   const fetchActiveJobs = useCallback(async () => {
 
@@ -224,8 +225,33 @@ const Dashboard = () => {
     };
   }, [isFullscreen]);
 
+  // Update current time every second when in fullscreen mode
+  useEffect(() => {
+    if (!isFullscreen) return;
+
+    const timeInterval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timeInterval);
+  }, [isFullscreen]);
+
   const handleRefresh = () => {
     fetchActiveJobs();
+  };
+
+  const formatCurrentTime = (date) => {
+    const options = {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false // 24-hour format is more common in Thailand
+    };
+    return date.toLocaleDateString('th-TH', options);
   };
 
   const formatLastUpdated = (date) => {
@@ -285,13 +311,18 @@ const Dashboard = () => {
       )}
 
       {isFullscreen && (
-        <button 
-          onClick={toggleFullscreen} 
-          className="exit-fullscreen-btn"
-          title="Exit Fullscreen (Esc)"
-        >
-          ✕
-        </button>
+        <>
+          <button 
+            onClick={toggleFullscreen} 
+            className="exit-fullscreen-btn"
+            title="Exit Fullscreen (Esc)"
+          >
+            ✕
+          </button>
+          <div className="fullscreen-time-display">
+            {formatCurrentTime(currentTime)}
+          </div>
+        </>
       )}
 
       <main className={`dashboard-main ${isFullscreen ? 'fullscreen-main' : ''}`}>
