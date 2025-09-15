@@ -253,7 +253,7 @@ const Dashboard = () => {
                   🏭
                 </div>
               </div>
-              <h1 className="dashboard-title">Manufacturing Dashboard</h1>
+              <h1 className="dashboard-title">MFG Dashboard</h1>
             </div>
             <div className="dashboard-controls">
               <div className="status-info">
