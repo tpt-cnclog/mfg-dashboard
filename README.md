@@ -1,8 +1,10 @@
-# Manufacturing Dashboard
+# MFG Dashboard
 
 A real-time manufacturing dashboard that displays "On Process" CNC jobs with live data integration from Google Sheets.
 
-![Dashboard Preview](https://via.placeholder.com/800x400/667eea/ffffff?text=Manufacturing+Dashboard)
+🌐 **Live Demo**: https://tpt-cnclog.github.io/mfg-dashboard/
+
+![Dashboard Preview](https://via.placeholder.com/800x400/667eea/ffffff?text=MFG+Dashboard)
 
 ## 🚀 Features
 
@@ -149,14 +151,19 @@ Modify grid layout in `src/components/Dashboard.css`:
 
 ## 🚀 Deployment
 
-### Static Hosting (Recommended)
+### GitHub Pages (Automated)
+```bash
+npm run deploy
+```
+Automatically builds and deploys to: https://tpt-cnclog.github.io/mfg-dashboard/
+
+### Static Hosting (Manual)
 ```bash
 npm run build
 ```
 Deploy the `build` folder to:
 - Netlify
 - Vercel
-- GitHub Pages
 - AWS S3
 - Any static hosting service
 
