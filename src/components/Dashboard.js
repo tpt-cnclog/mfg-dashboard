@@ -241,7 +241,7 @@ const Dashboard = () => {
             <div className="header-left">
               <div className="logo-container">
                 <img 
-                  src="/logo.png" 
+                  src="/company-logo.png" 
                   alt="Company Logo" 
                   className="dashboard-logo"
                   onError={(e) => {
