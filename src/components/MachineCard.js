@@ -138,7 +138,7 @@ const MachineCard = ({ job }) => {
 
       <div className="timing-info">
         <div className="start-time">
-          <span className="time-label">Started:</span>
+          <span className="time-label">วันที่เริ่ม Process:</span>
           <div className="time-details">
             <span className="time-date">{formatDate(startTime)}</span>
             <span className="time-time">{formatTime(startTime)}</span>
