@@ -132,7 +132,7 @@ const MachineCard = ({ job }) => {
         </div>
         <div className="job-specs">
           <span className="drawing">Drawing: {drawingNo || 'N/A'}</span>
-          <span className="quantity">Qty: {quantityOrdered || 0}</span>
+          <span className="quantity">Qty Ordered: {quantityOrdered || 0}</span>
         </div>
       </div>
 
