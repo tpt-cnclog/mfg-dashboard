@@ -1716,7 +1716,7 @@ function doPost(e) {
 }
 
 function doGet(e) {
-  // ===== EXISTING FUNCTIONALITY - PRESERVED =====
+  // ===== PRESERVE ORIGINAL FUNCTIONALITY EXACTLY =====
   if (e.parameter.mode === 'openJobs') {
     const projectNo = normalizeProjectNo(e.parameter.projectNo || '');
     const partName = normalize(e.parameter.partName || '');
@@ -1748,28 +1748,34 @@ function doGet(e) {
       .setMimeType(ContentService.MimeType.JSON);
   }
 
-  // ===== NEW DASHBOARD API FUNCTIONALITY =====
-  try {
-    const action = e.parameter.action || 'getActiveJobs';
-    
-    switch(action) {
-      case 'getActiveJobs':
-        return getDashboardActiveJobs();
-      case 'getAllJobs':
-        return getDashboardAllJobs();
-      case 'getMachineStatus':
-        return getDashboardMachineStatus();
-      case 'test':
-        return getDashboardTestConnection();
-      default:
-        // If no valid dashboard action, return original behavior
-        return ContentService.createTextOutput("Invalid request");
+  // ===== DASHBOARD API - ONLY IF action PARAMETER EXISTS =====
+  if (e.parameter.action) {
+    try {
+      const action = e.parameter.action;
+      
+      switch(action) {
+        case 'getActiveJobs':
+          return getDashboardActiveJobs();
+        case 'getAllJobs':
+          return getDashboardAllJobs();
+        case 'getMachineStatus':
+          return getDashboardMachineStatus();
+        case 'test':
+          return getDashboardTestConnection();
+        case 'getVersion':
+          return getDashboardVersion();
+        default:
+          return ContentService.createTextOutput("Invalid dashboard action");
+      }
+    } catch (error) {
+      console.error('Dashboard API Error:', error);
+      return ContentService.createTextOutput(JSON.stringify({error: error.toString()}))
+        .setMimeType(ContentService.MimeType.JSON);
     }
-  } catch (error) {
-    console.error('Dashboard API Error:', error);
-    return ContentService.createTextOutput(JSON.stringify({error: error.toString()}))
-      .setMimeType(ContentService.MimeType.JSON);
   }
+  
+  // ===== ORIGINAL DEFAULT BEHAVIOR =====
+  return ContentService.createTextOutput("Invalid request");
 }
 
 
@@ -1937,15 +1943,23 @@ function autoStopAllOTJobs() {
 
 /**
  * Dashboard API: Get only active jobs from Production Summary sheet
+ * SEPARATE FROM MAIN LOGGING FUNCTIONALITY
  */
 function getDashboardActiveJobs() {
   try {
-    // Get Production Summary sheet (different from CNC LOG)
-    const ss = SpreadsheetApp.openById('1-WD-HFlRKFUJJvM1mwPKR07J_xZ2nwPaEobLlRoUlVc');
+    // Use getActiveSpreadsheet to match original code pattern
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
     const sheet = ss.getSheetByName('Production Summary');
     
     if (!sheet) {
-      throw new Error('Production Summary sheet not found');
+      // Return empty result instead of error to avoid breaking main functionality
+      return ContentService.createTextOutput(JSON.stringify({
+        success: true,
+        data: [],
+        timestamp: new Date().toISOString(),
+        count: 0,
+        message: 'Production Summary sheet not found'
+      })).setMimeType(ContentService.MimeType.JSON);
     }
     
     const allData = getDashboardSheetData(sheet);
@@ -1961,24 +1975,34 @@ function getDashboardActiveJobs() {
     })).setMimeType(ContentService.MimeType.JSON);
     
   } catch (error) {
+    // Log error but don't break main functionality
     console.error('getDashboardActiveJobs Error:', error);
     return ContentService.createTextOutput(JSON.stringify({
       success: false,
-      error: error.toString()
+      error: error.toString(),
+      data: [],
+      count: 0
     })).setMimeType(ContentService.MimeType.JSON);
   }
 }
 
 /**
  * Dashboard API: Get all jobs from Production Summary sheet
+ * SEPARATE FROM MAIN LOGGING FUNCTIONALITY
  */
 function getDashboardAllJobs() {
   try {
-    const ss = SpreadsheetApp.openById('1-WD-HFlRKFUJJvM1mwPKR07J_xZ2nwPaEobLlRoUlVc');
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
     const sheet = ss.getSheetByName('Production Summary');
     
     if (!sheet) {
-      throw new Error('Production Summary sheet not found');
+      return ContentService.createTextOutput(JSON.stringify({
+        success: true,
+        data: [],
+        timestamp: new Date().toISOString(),
+        count: 0,
+        message: 'Production Summary sheet not found'
+      })).setMimeType(ContentService.MimeType.JSON);
     }
     
     const allData = getDashboardSheetData(sheet);
@@ -1994,21 +2018,29 @@ function getDashboardAllJobs() {
     console.error('getDashboardAllJobs Error:', error);
     return ContentService.createTextOutput(JSON.stringify({
       success: false,
-      error: error.toString()
+      error: error.toString(),
+      data: [],
+      count: 0
     })).setMimeType(ContentService.MimeType.JSON);
   }
 }
 
 /**
  * Dashboard API: Get machine status summary
+ * SEPARATE FROM MAIN LOGGING FUNCTIONALITY
  */
 function getDashboardMachineStatus() {
   try {
-    const ss = SpreadsheetApp.openById('1-WD-HFlRKFUJJvM1mwPKR07J_xZ2nwPaEobLlRoUlVc');
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
     const sheet = ss.getSheetByName('Production Summary');
     
     if (!sheet) {
-      throw new Error('Production Summary sheet not found');
+      return ContentService.createTextOutput(JSON.stringify({
+        success: true,
+        data: [],
+        timestamp: new Date().toISOString(),
+        message: 'Production Summary sheet not found'
+      })).setMimeType(ContentService.MimeType.JSON);
     }
     
     const allData = getDashboardSheetData(sheet);
@@ -2044,7 +2076,8 @@ function getDashboardMachineStatus() {
     console.error('getDashboardMachineStatus Error:', error);
     return ContentService.createTextOutput(JSON.stringify({
       success: false,
-      error: error.toString()
+      error: error.toString(),
+      data: []
     })).setMimeType(ContentService.MimeType.JSON);
   }
 }
@@ -2062,57 +2095,170 @@ function getDashboardTestConnection() {
 }
 
 /**
- * Helper function to read and parse Production Summary sheet data
+ * Dashboard API: Get data version for smart polling with caching
+ * ISOLATED DASHBOARD FUNCTION - MULTI-USER OPTIMIZED
  */
-function getDashboardSheetData(sheet) {
-  const values = sheet.getDataRange().getValues();
-  const headers = values[0];
-  const data = [];
-  
-  // Find column indices (handle different column name variations)
-  const colIndices = {
-    projectNo: Math.max(headers.indexOf('Project No'), headers.indexOf('Project No.')),
-    partName: headers.indexOf('Part Name'),
-    customer: headers.indexOf('Customer'),
-    drawingNo: Math.max(headers.indexOf('Drawing No'), headers.indexOf('Drawing No.')),
-    quantityOrdered: headers.indexOf('Quantity Ordered'),
-    status: Math.max(headers.indexOf('Status'), headers.indexOf('STATUS')),
-    machine: Math.max(headers.indexOf('Machine'), headers.indexOf('Machine no.')),
-    process: Math.max(headers.indexOf('Process'), headers.indexOf('Lastest Process')),
-    processNo: Math.max(headers.indexOf('Process No'), headers.indexOf('Process No.')),
-    stepNo: Math.max(headers.indexOf('Step No'), headers.indexOf('Step No.')),
-    startTime: Math.max(headers.indexOf('Start Time'), headers.indexOf('Start time')),
-    operator: Math.max(headers.indexOf('Operator'), -1) // No operator column in CSV
-  };
-  
-  // Parse data rows (skip header)
-  for (let i = 1; i < values.length; i++) {
-    const row = values[i];
+function getDashboardVersion() {
+  try {
+    // Simple caching to reduce API calls - cache for 2 seconds
+    const now = new Date().getTime();
+    const cacheKey = 'dashboardVersionCache';
     
-    // Skip empty rows
-    if (!row[colIndices.projectNo] && !row[colIndices.partName]) {
-      continue;
+    // Try to get cached version (Google Apps Script doesn't have persistent cache, so this is session-based)
+    let cachedData = null;
+    try {
+      // Use PropertiesService for short-term caching (not ideal but works)
+      const cache = PropertiesService.getScriptProperties();
+      const cachedValue = cache.getProperty(cacheKey);
+      if (cachedValue) {
+        cachedData = JSON.parse(cachedValue);
+        // Use cache if it's less than 2 seconds old
+        if (cachedData && (now - cachedData.timestamp) < 2000) {
+          console.log('📦 Using cached version data');
+          return ContentService.createTextOutput(JSON.stringify({
+            success: true,
+            version: cachedData.version,
+            cached: true
+          })).setMimeType(ContentService.MimeType.JSON);
+        }
+      }
+    } catch (cacheError) {
+      console.warn('Cache read failed, proceeding with fresh data:', cacheError);
     }
     
-    const jobData = {
-      projectNo: row[colIndices.projectNo] || '',
-      partName: row[colIndices.partName] || '',
-      customer: row[colIndices.customer] || '',
-      drawingNo: row[colIndices.drawingNo] || '',
-      quantityOrdered: row[colIndices.quantityOrdered] || 0,
-      status: row[colIndices.status] || '',
-      machine: row[colIndices.machine] || '',
-      process: row[colIndices.process] || '',
-      processNo: row[colIndices.processNo] || '',
-      stepNo: row[colIndices.stepNo] || '',
-      startTime: row[colIndices.startTime] || '',
-      operator: row[colIndices.operator] || '',
-      rowIndex: i + 1
+    const ss = SpreadsheetApp.openById('1-WD-HFlRKFUJJvM1mwPKR07J_xZ2nwPaEobLlRoUlVc');
+    const sheet = ss.getSheetByName('Production Summary');
+    
+    if (!sheet) {
+      throw new Error('Production Summary sheet not found');
+    }
+    
+    // Get lightweight version information
+    const lastRow = sheet.getLastRow();
+    const currentTime = now;
+    
+    // Calculate simple hash of critical data - reduced scope for better performance with multiple users
+    let dataHash = 0;
+    if (lastRow > 1) {
+      try {
+        // Only check first 10 rows for hash to reduce load with multiple users
+        const maxRows = Math.min(lastRow - 1, 10);
+        const criticalRange = sheet.getRange(2, 5, maxRows, 6); // Reduced columns too
+        const values = criticalRange.getValues();
+        
+        // Simple hash calculation including row count
+        dataHash = lastRow * 31;
+        
+        for (let i = 0; i < values.length; i++) {
+          for (let j = 0; j < values[i].length; j++) {
+            const cellValue = String(values[i][j] || '');
+            // Simplified hash calculation for better performance
+            dataHash = ((dataHash << 3) - dataHash + cellValue.length) & 0xffffffff;
+          }
+        }
+      } catch (hashError) {
+        console.warn('Hash calculation failed, using row count and timestamp:', hashError);
+        dataHash = lastRow * Math.floor(currentTime / 10000); // Change every 10 seconds max
+      }
+    }
+    
+    const version = {
+      lastModified: currentTime,
+      rowCount: lastRow,
+      dataHash: Math.abs(dataHash),
+      timestamp: new Date().toISOString()
     };
     
-    data.push(jobData);
+    // Cache the result for 2 seconds to help with multiple users
+    try {
+      const cache = PropertiesService.getScriptProperties();
+      cache.setProperty(cacheKey, JSON.stringify({
+        version: version,
+        timestamp: now
+      }));
+    } catch (cacheError) {
+      console.warn('Cache write failed:', cacheError);
+    }
+    
+    return ContentService.createTextOutput(JSON.stringify({
+      success: true,
+      version: version,
+      cached: false
+    })).setMimeType(ContentService.MimeType.JSON);
+    
+  } catch (error) {
+    console.error('getDashboardVersion Error:', error);
+    return ContentService.createTextOutput(JSON.stringify({
+      success: false,
+      error: error.toString(),
+      version: {
+        lastModified: new Date().getTime(),
+        rowCount: 0,
+        dataHash: 0,
+        timestamp: new Date().toISOString()
+      }
+    })).setMimeType(ContentService.MimeType.JSON);
   }
-  
-  console.log(`Dashboard: Found ${data.length} jobs in Production Summary sheet`);
-  return data;
+}
+function getDashboardSheetData(sheet) {
+  try {
+    const values = sheet.getDataRange().getValues();
+    if (!values || values.length === 0) {
+      return [];
+    }
+    
+    const headers = values[0];
+    const data = [];
+    
+    // Find column indices (handle different column name variations)
+    const colIndices = {
+      projectNo: Math.max(headers.indexOf('Project No'), headers.indexOf('Project No.')),
+      partName: headers.indexOf('Part Name'),
+      customer: headers.indexOf('Customer'),
+      drawingNo: Math.max(headers.indexOf('Drawing No'), headers.indexOf('Drawing No.')),
+      quantityOrdered: headers.indexOf('Quantity Ordered'),
+      status: Math.max(headers.indexOf('Status'), headers.indexOf('STATUS')),
+      machine: Math.max(headers.indexOf('Machine'), headers.indexOf('Machine no.')),
+      process: Math.max(headers.indexOf('Process'), headers.indexOf('Lastest Process')),
+      processNo: Math.max(headers.indexOf('Process No'), headers.indexOf('Process No.')),
+      stepNo: Math.max(headers.indexOf('Step No'), headers.indexOf('Step No.')),
+      startTime: Math.max(headers.indexOf('Start Time'), headers.indexOf('Start time')),
+      operator: Math.max(headers.indexOf('Operator'), -1), // No operator column in CSV
+      processStatus: Math.max(headers.indexOf('PROCESS STATUS'), headers.indexOf('Process Status'))
+    };
+    
+    // Parse data rows (skip header)
+    for (let i = 1; i < values.length; i++) {
+      const row = values[i];
+      
+      // Skip empty rows
+      if (!row[colIndices.projectNo] && !row[colIndices.partName]) {
+        continue;
+      }
+      
+      const jobData = {
+        projectNo: row[colIndices.projectNo] || '',
+        partName: row[colIndices.partName] || '',
+        customer: row[colIndices.customer] || '',
+        drawingNo: row[colIndices.drawingNo] || '',
+        quantityOrdered: row[colIndices.quantityOrdered] || 0,
+        status: row[colIndices.status] || '',
+        machine: row[colIndices.machine] || '',
+        process: row[colIndices.process] || '',
+        processNo: row[colIndices.processNo] || '',
+        stepNo: row[colIndices.stepNo] || '',
+        startTime: row[colIndices.startTime] || '',
+        operator: row[colIndices.operator] || '',
+        processStatus: row[colIndices.processStatus] || '',
+        rowIndex: i + 1
+      };
+      
+      data.push(jobData);
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('getDashboardSheetData Error:', error);
+    return []; // Return empty array instead of throwing
+  }
 }

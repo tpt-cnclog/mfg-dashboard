@@ -251,3 +251,124 @@
     gap: 5px;
   }
 }
+
+/* ========================================
+   ENHANCED STATUS INDICATORS
+   ======================================== */
+
+/* Machine status with individual colors */
+.machine-status {
+  font-weight: bold;
+  font-size: 1.3em;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  text-align: center;
+}
+
+.machine-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-weight: bold;
+  font-size: 1.2em;
+  color: #2c3e50;
+}
+
+.machine-name.active {
+  color: #2c3e50; /* Black for all statuses */
+}
+
+.machine-name.paused {
+  color: #2c3e50; /* Black for all statuses */
+}
+
+.machine-name.overtime {
+  color: #2c3e50; /* Black for all statuses */
+}
+
+.machine-name.unknown {
+  color: #2c3e50; /* Black for all statuses */
+}
+
+/* Aggregate status badge */
+.aggregate-status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  color: white;
+  font-size: 0.8em;
+  font-weight: bold;
+  margin: 4px 0 8px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.aggregate-status-badge.active {
+  background-color: #4caf50; /* Green */
+}
+
+.aggregate-status-badge.paused,
+.aggregate-status-badge.partial-pause {
+  background-color: #f44336; /* Red */
+}
+
+.aggregate-status-badge.overtime {
+  background-color: #2196f3; /* Blue */
+}
+
+.aggregate-status-badge.unknown {
+  background-color: #9e9e9e; /* Gray */
+}
+
+/* Status detail text */
+.status-detail {
+  font-size: 0.85em;
+  color: #666;
+  margin-bottom: 8px;
+  font-style: italic;
+}
+
+/* Machine separator styling */
+.machine-separator {
+  color: #666;
+  margin: 0 2px;
+}
+
+/* Enhanced status hover effects */
+.machine-status:hover .machine-name {
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.aggregate-status-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+/* Status icons */
+.status-emoji {
+  font-size: 0.9em;
+  margin-right: 2px;
+}
+
+/* Responsive adjustments for status elements */
+@media (max-width: 768px) {
+  .machine-status {
+    font-size: 1em;
+  }
+  
+  .aggregate-status-badge {
+    font-size: 0.75em;
+    padding: 3px 6px;
+  }
+  
+  .status-detail {
+    font-size: 0.8em;
+  }
+}

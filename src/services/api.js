@@ -4,7 +4,8 @@ import axios from 'axios';
 const API_CONFIG = {
   // Replace this with your Google Apps Script Web App URL
   BASE_URL: 'https://script.google.com/macros/s/AKfycbx7ld5mQfVZAloeJMcufoubwuhsKbbIm4hCnDqiW5CPEUtK8pQIO68Lp4vkDT2HFVd05w/exec',
-  REFRESH_INTERVAL: 30000, // 30 seconds
+  REFRESH_INTERVAL: 30000, // 30 seconds (fallback)
+  VERSION_CHECK_INTERVAL: 5000, // 5 seconds for version checks
 };
 
 class ManufacturingAPI {
@@ -87,6 +88,32 @@ class ManufacturingAPI {
         success: false,
         error: this.getErrorMessage(error),
         data: {}
+      };
+    }
+  }
+
+  /**
+   * Get data version for smart polling (lightweight check)
+   * DASHBOARD-ONLY FUNCTION - DOES NOT AFFECT ORIGINAL LOGGING
+   */
+  async getDataVersion() {
+    try {
+      const response = await this.apiClient.get(`${API_CONFIG.BASE_URL}?action=getVersion`);
+      
+      if (response.data && response.data.success) {
+        return {
+          success: true,
+          version: response.data.version
+        };
+      } else {
+        throw new Error(response.data?.error || 'Failed to fetch data version');
+      }
+    } catch (error) {
+      console.error('Error fetching data version:', error);
+      return {
+        success: false,
+        error: this.getErrorMessage(error),
+        version: null
       };
     }
   }

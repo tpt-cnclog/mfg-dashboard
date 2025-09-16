@@ -3,6 +3,80 @@ import MachineCard from './MachineCard';
 import manufacturingAPI from '../services/api';
 import './Dashboard.css';
 
+// Enhanced status parsing utility functions
+const parseProcessStatus = (processStatusString, machineString) => {
+  // Debug logging
+  console.log('parseProcessStatus called with:', { processStatusString, machineString });
+  
+  if (!processStatusString || !machineString) {
+    console.log('Missing data - processStatus:', processStatusString, 'machine:', machineString);
+    return { 
+      aggregate: 'UNKNOWN', 
+      machines: [],
+      detail: 'No status data'
+    };
+  }
+  
+  // Parse comma-separated values, handle quoted strings
+  const statuses = processStatusString.replace(/"/g, '').split(',').map(s => s.trim().toUpperCase());
+  const machines = machineString.replace(/"/g, '').split(',').map(m => m.trim());
+  
+  // Create machine-status pairs
+  const machineStatuses = machines.map((machine, index) => ({
+    name: machine,
+    status: statuses[index] || 'UNKNOWN',
+    color: getStatusColor(statuses[index] || 'UNKNOWN'),
+    emoji: getStatusEmoji(statuses[index] || 'UNKNOWN')
+  }));
+  
+  // Count status types
+  const pausedMachines = machineStatuses.filter(m => m.status.includes('PAUSE'));
+  const otMachines = machineStatuses.filter(m => m.status.includes('OT'));
+  const activeMachines = machineStatuses.filter(m => m.status.includes('OPEN'));
+  
+  // Determine aggregate status with priority: PAUSE > OT > OPEN
+  let aggregate, detail, badgeColor;
+  if (pausedMachines.length > 0) {
+    if (pausedMachines.length === machines.length) {
+      aggregate = 'PAUSED';
+      detail = `All machines paused`;
+      badgeColor = '#f44336'; // Red
+    } else {
+      aggregate = 'PARTIAL_PAUSE';
+      detail = `${pausedMachines.map(m => m.name).join(', ')} paused`;
+      badgeColor = '#f44336'; // Red
+    }
+  } else if (otMachines.length > 0) {
+    aggregate = 'OVERTIME';
+    detail = `${otMachines.map(m => m.name).join(', ')} in overtime`;
+    badgeColor = '#2196f3'; // Blue
+  } else if (activeMachines.length > 0) {
+    aggregate = 'ACTIVE';
+    detail = null; // Remove detail for active machines
+    badgeColor = '#4caf50'; // Green
+  } else {
+    aggregate = 'UNKNOWN';
+    detail = 'Status unclear';
+    badgeColor = '#9e9e9e'; // Gray
+  }
+  
+  return { aggregate, machines: machineStatuses, detail, badgeColor };
+};
+
+const getStatusColor = (status) => {
+  if (status.includes('PAUSE')) return '#f44336'; // Red
+  if (status.includes('OT')) return '#2196f3';    // Blue
+  if (status.includes('OPEN')) return '#4caf50';  // Green
+  return '#9e9e9e'; // Gray
+};
+
+const getStatusEmoji = (status) => {
+  if (status.includes('PAUSE')) return '🔴';
+  if (status.includes('OT')) return '🔵';
+  if (status.includes('OPEN')) return '🟢';
+  return '⚪';
+};
+
 const Dashboard = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,6 +87,10 @@ const Dashboard = () => {
   const [isIdle, setIsIdle] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  
+  // Smart polling state - DASHBOARD ONLY, NO INTERFERENCE WITH ORIGINAL FUNCTIONS
+  const [lastDataVersion, setLastDataVersion] = useState(null);
+  const [versionCheckFailed, setVersionCheckFailed] = useState(false);
 
   const fetchActiveJobs = useCallback(async () => {
 
@@ -22,17 +100,28 @@ const Dashboard = () => {
       
       if (result.success) {
         // Transform API data to match MachineCard expectations
-        const transformedJobs = result.data.map(job => ({
-          ...job,
-          machineNo: job.machine || 'No Machine',
-          latestProcess: job.process || 'N/A',
-          drawingNo: job.drawingNo || 'N/A',
-          quantityOrdered: job.quantityOrdered || 0,
-          statusLED: {
-            color: 'green',
-            text: 'On Process'
-          }
-        }));
+        const transformedJobs = result.data.map(job => {
+          // Parse process status for enhanced machine status
+          const statusInfo = parseProcessStatus(job.processStatus, job.machine);
+          
+          return {
+            ...job,
+            machineNo: job.machine || 'No Machine',
+            latestProcess: job.process || 'N/A',
+            drawingNo: job.drawingNo || 'N/A',
+            quantityOrdered: job.quantityOrdered || 0,
+            statusLED: {
+              color: 'green',
+              text: 'On Process'
+            },
+            // Enhanced status information
+            processStatusInfo: statusInfo,
+            machines: statusInfo.machines,
+            aggregateStatus: statusInfo.aggregate,
+            statusDetail: statusInfo.detail,
+            statusBadgeColor: statusInfo.badgeColor
+          };
+        });
 
         // Sort by start time (latest to oldest)
         const sortedJobs = transformedJobs.sort((a, b) => {
@@ -54,19 +143,88 @@ const Dashboard = () => {
     }
   }, []);
 
+  // Smart polling version check - DASHBOARD ONLY FUNCTION WITH MULTI-USER OPTIMIZATION
+  const checkDataVersion = useCallback(async () => {
+    try {
+      const versionResult = await manufacturingAPI.getDataVersion();
+      
+      if (versionResult.success && versionResult.version) {
+        const currentVersion = versionResult.version;
+        
+        // Check if data has changed (compare hash and timestamp)
+        if (!lastDataVersion || 
+            currentVersion.dataHash !== lastDataVersion.dataHash ||
+            currentVersion.rowCount !== lastDataVersion.rowCount) {
+          
+          console.log('📊 Data version changed - fetching fresh data', {
+            oldHash: lastDataVersion?.dataHash,
+            newHash: currentVersion.dataHash,
+            oldRows: lastDataVersion?.rowCount,
+            newRows: currentVersion.rowCount,
+            cached: versionResult.cached || false
+          });
+          
+          // Data has changed, fetch new data
+          await fetchActiveJobs();
+          setLastDataVersion(currentVersion);
+          setVersionCheckFailed(false);
+        } else {
+          // Data hasn't changed, just update the version check timestamp
+          setLastDataVersion(currentVersion);
+          setVersionCheckFailed(false);
+          if (versionResult.cached) {
+            console.log('📦 Version check - no changes (cached)');
+          }
+        }
+      } else {
+        console.warn('Version check failed, falling back to regular polling');
+        setVersionCheckFailed(true);
+      }
+    } catch (err) {
+      // Handle rate limiting gracefully
+      if (err.message.includes('quota') || err.message.includes('rate') || err.message.includes('limit')) {
+        console.warn('⚠️ Rate limit detected, increasing polling interval:', err.message);
+        setVersionCheckFailed(true); // This will trigger slower fallback polling
+      } else {
+        console.warn('Version check error, falling back to regular polling:', err.message);
+        setVersionCheckFailed(true);
+      }
+    }
+  }, [lastDataVersion, fetchActiveJobs]);
+
   // Initial data fetch
   useEffect(() => {
     fetchActiveJobs();
   }, [fetchActiveJobs]);
 
-  // Auto-refresh every 30 seconds
+  // Smart Polling System - DASHBOARD ONLY, NO INTERFERENCE WITH ORIGINAL FUNCTIONS
   useEffect(() => {
-    const interval = setInterval(() => {
-      fetchActiveJobs();
-    }, 30000); // 30 seconds
+    if (versionCheckFailed) {
+      // Fallback to traditional polling if version checks fail
+      console.log('🔄 Using fallback polling (30s) due to version check failures');
+      
+      // Randomize fallback interval to distribute load (25-35 seconds)
+      const randomFallbackInterval = 25000 + Math.random() * 10000;
+      const fallbackInterval = setInterval(() => {
+        fetchActiveJobs();
+      }, randomFallbackInterval);
 
-    return () => clearInterval(interval);
-  }, [fetchActiveJobs]);
+      return () => clearInterval(fallbackInterval);
+    } else {
+      // Use smart polling - randomized version checks to prevent polling storms
+      console.log('⚡ Using smart polling with randomized intervals');
+      
+      // Randomize smart polling interval (4-6 seconds) to distribute load across users
+      const randomSmartInterval = 4000 + Math.random() * 2000;
+      console.log(`📊 Smart polling interval: ${(randomSmartInterval/1000).toFixed(1)}s`);
+      
+      const smartInterval = setInterval(() => {
+        checkDataVersion();
+      }, randomSmartInterval);
+
+      return () => clearInterval(smartInterval);
+    }
+  }, [versionCheckFailed, fetchActiveJobs, checkDataVersion]);
 
   // Header visibility based on scroll
   useEffect(() => {
