@@ -239,7 +239,7 @@ const Dashboard = () => {
   }, []);
 
   // Fullscreen mode toggle
-  const toggleFullscreen = useCallback(async () => {
+  const toggleFullscreen = async () => {
     if (!isFullscreen) {
       // Enter fullscreen
       try {
@@ -273,7 +273,7 @@ const Dashboard = () => {
         setIsFullscreen(false);
       }
     }
-  }, [isFullscreen]);
+  };
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -313,7 +313,7 @@ const Dashboard = () => {
       document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
       document.removeEventListener('msfullscreenchange', handleFullscreenChange);
     };
-  }, [isFullscreen, toggleFullscreen]);
+  }, [isFullscreen]);
 
   // Update current time every second when in fullscreen mode
   useEffect(() => {
