@@ -178,8 +178,16 @@
 
 .time-details {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.datetime-info {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
 }
 
 .time-date {
@@ -201,6 +209,29 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.process-age-inline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.process-age-label {
+  font-size: 11px;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.process-age-inline .age-value {
+  font-size: 13px;
+  color: #17a2b8;
+  font-weight: bold;
+  background: #e3f7fc;
+  padding: 4px 8px;
+  border-radius: 12px;
+  border: 1px solid #bee5eb;
 }
 
 .age-label {

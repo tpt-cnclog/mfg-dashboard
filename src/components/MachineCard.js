@@ -235,8 +235,14 @@ const MachineCard = ({ job }) => {
         <div className="start-time">
           <span className="time-label">วันที่เริ่ม Process ล่าสุด:</span>
           <div className="time-details">
-            <span className="time-date">{formatDate(startTime)}</span>
-            <span className="time-time">{formatTime(startTime)}</span>
+            <div className="datetime-info">
+              <span className="time-date">{formatDate(startTime)}</span>
+              <span className="time-time">{formatTime(startTime)}</span>
+            </div>
+            <div className="process-age-inline">
+              <span className="process-age-label">Process Age:</span>
+              <span className="age-value">{calculateJobAge(startTime)}</span>
+            </div>
           </div>
         </div>
         <div className="job-age">
