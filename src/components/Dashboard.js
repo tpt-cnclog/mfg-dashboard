@@ -108,6 +108,7 @@ const Dashboard = () => {
             latestProcess: job.process || 'N/A',
             drawingNo: job.drawingNo || 'N/A',
             quantityOrdered: job.quantityOrdered || 0,
+            projectStartDate: job.projectStartDate, // Explicitly pass through project start date
             statusLED: {
               color: 'green',
               text: 'On Process'

@@ -2269,6 +2269,11 @@ function getDashboardSheetData(sheet) {
       customer: headers.indexOf('Customer'),
       drawingNo: Math.max(headers.indexOf('Drawing No'), headers.indexOf('Drawing No.')),
       quantityOrdered: headers.indexOf('Quantity Ordered'),
+      projectStartDate: Math.max(
+        headers.indexOf('Project Start date'), 
+        headers.indexOf('Project Start Date'),
+        headers.findIndex(h => h && h.trim().toLowerCase() === 'project start date')
+      ),
       status: Math.max(headers.indexOf('Status'), headers.indexOf('STATUS')),
       machine: Math.max(headers.indexOf('Machine'), headers.indexOf('Machine no.')),
       process: Math.max(headers.indexOf('Process'), headers.indexOf('Lastest Process')),
@@ -2278,6 +2283,11 @@ function getDashboardSheetData(sheet) {
       operator: Math.max(headers.indexOf('Operator'), -1), // No operator column in CSV
       processStatus: Math.max(headers.indexOf('PROCESS STATUS'), headers.indexOf('Process Status'))
     };
+    
+    // Debug: Log headers and column indices
+    console.log('Headers:', headers);
+    console.log('Column Indices:', colIndices);
+    console.log('Project Start Date Index:', colIndices.projectStartDate);
     
     // Parse data rows (skip header)
     for (let i = 1; i < values.length; i++) {
@@ -2294,6 +2304,7 @@ function getDashboardSheetData(sheet) {
         customer: row[colIndices.customer] || '',
         drawingNo: row[colIndices.drawingNo] || '',
         quantityOrdered: row[colIndices.quantityOrdered] || 0,
+        projectStartDate: row[colIndices.projectStartDate] || '',
         status: row[colIndices.status] || '',
         machine: row[colIndices.machine] || '',
         process: row[colIndices.process] || '',

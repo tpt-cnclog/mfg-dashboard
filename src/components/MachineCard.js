@@ -16,6 +16,7 @@ const MachineCard = ({ job }) => {
     processNo,
     stepNo,
     startTime,
+    projectStartDate,
     projectNo,
     status,
     statusLED,
@@ -240,7 +241,7 @@ const MachineCard = ({ job }) => {
         </div>
         <div className="job-age">
           <span className="age-label">Job Age:</span>
-          <span className="age-value">{calculateJobAge(startTime)}</span>
+          <span className="age-value">{calculateJobAge(projectStartDate || startTime)}</span>
         </div>
       </div>
 
