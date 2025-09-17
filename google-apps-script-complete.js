@@ -820,6 +820,14 @@ function submitLog(data) {
             SpreadsheetApp.flush();
             console.log('✅ START_OT operation completed successfully');
             
+            // Invalidate dashboard cache when data changes
+            try {
+              invalidateDashboardCache();
+              console.log('🔄 Dashboard cache invalidated after START_OT operation');
+            } catch (cacheError) {
+              console.log('⚠️ Cache invalidation failed:', cacheError);
+            }
+            
             // Apply formatting with delay
             Utilities.sleep(200);
             formatRow(i + 1);
@@ -923,6 +931,14 @@ function submitLog(data) {
             
             SpreadsheetApp.flush();
             console.log('✅ STOP_OT operation completed successfully');
+            
+            // Invalidate dashboard cache when data changes
+            try {
+              invalidateDashboardCache();
+              console.log('🔄 Dashboard cache invalidated after STOP_OT operation');
+            } catch (cacheError) {
+              console.log('⚠️ Cache invalidation failed:', cacheError);
+            }
             
             // Apply formatting with delay
             Utilities.sleep(200);
@@ -1046,6 +1062,14 @@ function submitLog(data) {
             SpreadsheetApp.flush();
             console.log('✅ CONTINUE operation completed successfully');
             
+            // Invalidate dashboard cache when data changes
+            try {
+              invalidateDashboardCache();
+              console.log('🔄 Dashboard cache invalidated after CONTINUE operation');
+            } catch (cacheError) {
+              console.log('⚠️ Cache invalidation failed:', cacheError);
+            }
+            
             // Apply formatting with delay
             Utilities.sleep(200);
             formatRow(i + 1);
@@ -1113,6 +1137,15 @@ function submitLog(data) {
     sheet.appendRow(row);
     console.log("Row appended successfully");
     formatLastRow();
+    
+    // Invalidate dashboard cache when new job is created
+    try {
+      invalidateDashboardCache();
+      console.log('🔄 Dashboard cache invalidated after new job creation');
+    } catch (cacheError) {
+      console.log('⚠️ Cache invalidation failed:', cacheError);
+    }
+    
     return;
 
   } else if (data.status === "PAUSE") {
@@ -1211,6 +1244,14 @@ function submitLog(data) {
           pauseRange.setValues(pauseValues);
           SpreadsheetApp.flush();
           console.log('✅ PAUSE operation completed successfully');
+          
+          // Invalidate dashboard cache when data changes
+          try {
+            invalidateDashboardCache();
+            console.log('🔄 Dashboard cache invalidated after PAUSE operation');
+          } catch (cacheError) {
+            console.log('⚠️ Cache invalidation failed:', cacheError);
+          }
           
           // Apply formatting with delay
           Utilities.sleep(200);
@@ -1478,6 +1519,15 @@ function submitLog(data) {
             }
             
             found = true;
+            
+            // Invalidate dashboard cache when data changes
+            try {
+              invalidateDashboardCache();
+              console.log('🔄 Dashboard cache invalidated after CLOSE operation');
+            } catch (cacheError) {
+              console.log('⚠️ Cache invalidation failed:', cacheError);
+            }
+            
             return;
             
           } catch (closeError) {
@@ -1595,6 +1645,14 @@ function submitDailyReport(data) {
     // Append row to sheet
     sheet.appendRow(row);
     
+    // Invalidate dashboard cache when new job is created
+    try {
+      invalidateDashboardCache();
+      console.log('🔄 Dashboard cache invalidated after new job creation (duplicate)');
+    } catch (cacheError) {
+      console.log('⚠️ Cache invalidation failed:', cacheError);
+    }
+    
     // Format the new row
     const newRowNum = sheet.getLastRow();
     sheet.getRange(newRowNum, 1, 1, row.length).setBorder(true, true, true, true, true, true);
@@ -1670,6 +1728,14 @@ function submitQCReport(data) {
     
     console.log("Appending QC row:", row);
     sheet.appendRow(row);
+    
+    // Invalidate dashboard cache when new QC job is created
+    try {
+      invalidateDashboardCache();
+      console.log('🔄 Dashboard cache invalidated after new QC job creation');
+    } catch (cacheError) {
+      console.log('⚠️ Cache invalidation failed:', cacheError);
+    }
     
     // Format the new row using the standard formatting function
     formatLastRow();
@@ -1756,21 +1822,22 @@ function doGet(e) {
       switch(action) {
         case 'getActiveJobs':
           return getDashboardActiveJobs();
-        case 'getAllJobs':
-          return getDashboardAllJobs();
-        case 'getMachineStatus':
-          return getDashboardMachineStatus();
-        case 'test':
-          return getDashboardTestConnection();
         case 'getVersion':
           return getDashboardVersion();
+        case 'test':
+          return getDashboardTestConnection();
         default:
-          return ContentService.createTextOutput("Invalid dashboard action");
+          return ContentService.createTextOutput(JSON.stringify({
+            success: false,
+            error: `Invalid dashboard action: ${action}. Available actions: getActiveJobs, getVersion, test`
+          })).setMimeType(ContentService.MimeType.JSON);
       }
     } catch (error) {
       console.error('Dashboard API Error:', error);
-      return ContentService.createTextOutput(JSON.stringify({error: error.toString()}))
-        .setMimeType(ContentService.MimeType.JSON);
+      return ContentService.createTextOutput(JSON.stringify({
+        success: false,
+        error: error.toString()
+      })).setMimeType(ContentService.MimeType.JSON);
     }
   }
   
@@ -1947,6 +2014,36 @@ function autoStopAllOTJobs() {
  */
 function getDashboardActiveJobs() {
   try {
+    const now = new Date().getTime();
+    const cacheKey = 'dashboardActiveJobsCache';
+    
+    // Try to get cached data first (optimized for 10-20s polling)
+    try {
+      const cache = PropertiesService.getDocumentProperties();
+      const cachedValue = cache.getProperty(cacheKey);
+      if (cachedValue) {
+        const cachedData = JSON.parse(cachedValue);
+        // Use cache if it's less than 15 seconds old (shorter than polling interval)
+        if (cachedData && (now - cachedData.timestamp) < 15000) {
+          console.log('📦 Returning cached active jobs data');
+          return ContentService.createTextOutput(JSON.stringify({
+            success: true,
+            data: cachedData.data,
+            timestamp: cachedData.originalTimestamp,
+            count: cachedData.data.length,
+            cached: true,
+            cacheAge: Math.floor((now - cachedData.timestamp) / 1000)
+          })).setMimeType(ContentService.MimeType.JSON);
+        }
+      }
+    } catch (cacheError) {
+      // Continue without cache if error
+      console.log('Cache read error:', cacheError);
+    }
+    
+    // Fetch fresh data
+    console.log('🔄 Fetching fresh active jobs data');
+    
     // Use getActiveSpreadsheet to match original code pattern
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const sheet = ss.getSheetByName('Production Summary');
@@ -1967,12 +2064,29 @@ function getDashboardActiveJobs() {
       job.status === 'On Process'
     );
     
-    return ContentService.createTextOutput(JSON.stringify({
+    const result = {
       success: true,
       data: activeJobs,
       timestamp: new Date().toISOString(),
-      count: activeJobs.length
-    })).setMimeType(ContentService.MimeType.JSON);
+      count: activeJobs.length,
+      cached: false
+    };
+    
+    // Cache the result for 15 seconds
+    try {
+      const cache = PropertiesService.getDocumentProperties();
+      cache.setProperty(cacheKey, JSON.stringify({
+        data: activeJobs,
+        timestamp: now,
+        originalTimestamp: result.timestamp
+      }));
+      console.log('💾 Cached active jobs data for 15 seconds');
+    } catch (cacheError) {
+      console.log('Cache write error:', cacheError);
+      // Continue without caching if error
+    }
+    
+    return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
     
   } catch (error) {
     // Log error but don't break main functionality
@@ -1982,102 +2096,6 @@ function getDashboardActiveJobs() {
       error: error.toString(),
       data: [],
       count: 0
-    })).setMimeType(ContentService.MimeType.JSON);
-  }
-}
-
-/**
- * Dashboard API: Get all jobs from Production Summary sheet
- * SEPARATE FROM MAIN LOGGING FUNCTIONALITY
- */
-function getDashboardAllJobs() {
-  try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-    const sheet = ss.getSheetByName('Production Summary');
-    
-    if (!sheet) {
-      return ContentService.createTextOutput(JSON.stringify({
-        success: true,
-        data: [],
-        timestamp: new Date().toISOString(),
-        count: 0,
-        message: 'Production Summary sheet not found'
-      })).setMimeType(ContentService.MimeType.JSON);
-    }
-    
-    const allData = getDashboardSheetData(sheet);
-    
-    return ContentService.createTextOutput(JSON.stringify({
-      success: true,
-      data: allData,
-      timestamp: new Date().toISOString(),
-      count: allData.length
-    })).setMimeType(ContentService.MimeType.JSON);
-    
-  } catch (error) {
-    console.error('getDashboardAllJobs Error:', error);
-    return ContentService.createTextOutput(JSON.stringify({
-      success: false,
-      error: error.toString(),
-      data: [],
-      count: 0
-    })).setMimeType(ContentService.MimeType.JSON);
-  }
-}
-
-/**
- * Dashboard API: Get machine status summary
- * SEPARATE FROM MAIN LOGGING FUNCTIONALITY
- */
-function getDashboardMachineStatus() {
-  try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-    const sheet = ss.getSheetByName('Production Summary');
-    
-    if (!sheet) {
-      return ContentService.createTextOutput(JSON.stringify({
-        success: true,
-        data: [],
-        timestamp: new Date().toISOString(),
-        message: 'Production Summary sheet not found'
-      })).setMimeType(ContentService.MimeType.JSON);
-    }
-    
-    const allData = getDashboardSheetData(sheet);
-    
-    // Group by machine and get status
-    const machineStatus = {};
-    allData.forEach(job => {
-      if (job.machine) {
-        if (!machineStatus[job.machine]) {
-          machineStatus[job.machine] = {
-            machine: job.machine,
-            totalJobs: 0,
-            activeJobs: 0,
-            jobs: []
-          };
-        }
-        
-        machineStatus[job.machine].totalJobs++;
-        if (job.status === 'On Process') {
-          machineStatus[job.machine].activeJobs++;
-        }
-        machineStatus[job.machine].jobs.push(job);
-      }
-    });
-    
-    return ContentService.createTextOutput(JSON.stringify({
-      success: true,
-      data: Object.values(machineStatus),
-      timestamp: new Date().toISOString()
-    })).setMimeType(ContentService.MimeType.JSON);
-    
-  } catch (error) {
-    console.error('getDashboardMachineStatus Error:', error);
-    return ContentService.createTextOutput(JSON.stringify({
-      success: false,
-      error: error.toString(),
-      data: []
     })).setMimeType(ContentService.MimeType.JSON);
   }
 }
@@ -2095,37 +2113,57 @@ function getDashboardTestConnection() {
 }
 
 /**
- * Dashboard API: Get data version for smart polling with caching
- * ISOLATED DASHBOARD FUNCTION - MULTI-USER OPTIMIZED
+ * Dashboard API: Get data version for event-driven updates
+ * WORKS WITH EVENT TRIGGERS FOR MINIMAL EXECUTIONS
  */
 function getDashboardVersion() {
   try {
-    // Simple caching to reduce API calls - cache for 2 seconds
     const now = new Date().getTime();
     const cacheKey = 'dashboardVersionCache';
+    const invalidationKey = 'dashboardInvalidated';
     
-    // Try to get cached version (Google Apps Script doesn't have persistent cache, so this is session-based)
-    let cachedData = null;
+    // Check if data was invalidated due to sheet edits
+    let dataInvalidated = false;
     try {
-      // Use PropertiesService for short-term caching (not ideal but works)
       const cache = PropertiesService.getScriptProperties();
-      const cachedValue = cache.getProperty(cacheKey);
-      if (cachedValue) {
-        cachedData = JSON.parse(cachedValue);
-        // Use cache if it's less than 2 seconds old
-        if (cachedData && (now - cachedData.timestamp) < 2000) {
-          console.log('📦 Using cached version data');
-          return ContentService.createTextOutput(JSON.stringify({
-            success: true,
-            version: cachedData.version,
-            cached: true
-          })).setMimeType(ContentService.MimeType.JSON);
+      const invalidationData = cache.getProperty(invalidationKey);
+      if (invalidationData) {
+        const invalidation = JSON.parse(invalidationData);
+        // If invalidated in last 30 seconds, force fresh data
+        if ((now - invalidation.timestamp) < 30000) {
+          dataInvalidated = true;
+          console.log('🔔 Data invalidated by sheet edit, forcing fresh data');
+          cache.deleteProperty(invalidationKey); // Clear flag
         }
       }
-    } catch (cacheError) {
-      console.warn('Cache read failed, proceeding with fresh data:', cacheError);
+    } catch (invalidationError) {
+      // Continue without invalidation check
     }
     
+    // Try to get cached version if not invalidated
+    if (!dataInvalidated) {
+      try {
+        const cache = PropertiesService.getScriptProperties();
+        const cachedValue = cache.getProperty(cacheKey);
+        if (cachedValue) {
+          const cachedData = JSON.parse(cachedValue);
+          // Use cache if it's less than 8 seconds old (optimized for 10-20s polling)
+          if (cachedData && (now - cachedData.timestamp) < 8000) {
+            return ContentService.createTextOutput(JSON.stringify({
+              success: true,
+              version: cachedData.version,
+              cached: true,
+              eventDriven: true,
+              cacheAge: Math.floor((now - cachedData.timestamp) / 1000)
+            })).setMimeType(ContentService.MimeType.JSON);
+          }
+        }
+      } catch (cacheError) {
+        // Continue without cache if error
+      }
+    }
+    
+    // Fetch fresh data (only when invalidated or cache expired)
     const ss = SpreadsheetApp.openById('1-WD-HFlRKFUJJvM1mwPKR07J_xZ2nwPaEobLlRoUlVc');
     const sheet = ss.getSheetByName('Production Summary');
     
@@ -2133,43 +2171,54 @@ function getDashboardVersion() {
       throw new Error('Production Summary sheet not found');
     }
     
-    // Get lightweight version information
+    // Improved change detection - check more data for better sensitivity
     const lastRow = sheet.getLastRow();
-    const currentTime = now;
     
-    // Calculate simple hash of critical data - reduced scope for better performance with multiple users
-    let dataHash = 0;
+    console.log(`🔍 Checking sheet data: ${lastRow} rows`);
+    
+    // More comprehensive hash for better change detection
+    let quickHash = lastRow * 31; // Base on row count
     if (lastRow > 1) {
       try {
-        // Only check first 10 rows for hash to reduce load with multiple users
-        const maxRows = Math.min(lastRow - 1, 10);
-        const criticalRange = sheet.getRange(2, 5, maxRows, 6); // Reduced columns too
-        const values = criticalRange.getValues();
+        // Check status column (column 6) and machine column for more reliable detection
+        const statusRange = sheet.getRange(2, 6, Math.min(10, lastRow - 1), 1); // Status column
+        const machineRange = sheet.getRange(2, 7, Math.min(10, lastRow - 1), 1); // Machine column
+        const statusValues = statusRange.getValues();
+        const machineValues = machineRange.getValues();
         
-        // Simple hash calculation including row count
-        dataHash = lastRow * 31;
-        
-        for (let i = 0; i < values.length; i++) {
-          for (let j = 0; j < values[i].length; j++) {
-            const cellValue = String(values[i][j] || '');
-            // Simplified hash calculation for better performance
-            dataHash = ((dataHash << 3) - dataHash + cellValue.length) & 0xffffffff;
-          }
+        // Create hash from status and machine data
+        for (let i = 0; i < statusValues.length; i++) {
+          const statusVal = String(statusValues[i][0] || '');
+          const machineVal = String(machineValues[i][0] || '');
+          quickHash += (statusVal.length + machineVal.length) * (i + 1);
+          // Add first character of each value for more sensitivity
+          if (statusVal.length > 0) quickHash += statusVal.charCodeAt(0) * (i + 1);
+          if (machineVal.length > 0) quickHash += machineVal.charCodeAt(0) * (i + 2);
         }
+        
+        console.log(`📊 Generated hash: ${Math.abs(quickHash) % 1000000} from ${statusValues.length} status entries`);
       } catch (hashError) {
-        console.warn('Hash calculation failed, using row count and timestamp:', hashError);
-        dataHash = lastRow * Math.floor(currentTime / 10000); // Change every 10 seconds max
+        console.log('⚠️ Hash generation error, using timestamp fallback:', hashError);
+        // Fallback to timestamp-based hash
+        quickHash = lastRow * Math.floor(now / 30000); // Change every 30 seconds max
       }
     }
     
     const version = {
-      lastModified: currentTime,
+      lastModified: now,
       rowCount: lastRow,
-      dataHash: Math.abs(dataHash),
-      timestamp: new Date().toISOString()
+      dataHash: Math.abs(quickHash) % 1000000,
+      timestamp: new Date().toISOString(),
+      eventDriven: true
     };
     
-    // Cache the result for 2 seconds to help with multiple users
+    console.log(`✅ Version generated:`, {
+      rows: lastRow,
+      hash: version.dataHash,
+      timestamp: version.timestamp
+    });
+    
+    // Cache for 8 seconds (optimized for 10-20s polling intervals)
     try {
       const cache = PropertiesService.getScriptProperties();
       cache.setProperty(cacheKey, JSON.stringify({
@@ -2177,13 +2226,15 @@ function getDashboardVersion() {
         timestamp: now
       }));
     } catch (cacheError) {
-      console.warn('Cache write failed:', cacheError);
+      // Continue without caching if error
     }
     
     return ContentService.createTextOutput(JSON.stringify({
       success: true,
       version: version,
-      cached: false
+      cached: false,
+      eventDriven: true,
+      invalidated: dataInvalidated
     })).setMimeType(ContentService.MimeType.JSON);
     
   } catch (error) {
@@ -2195,7 +2246,8 @@ function getDashboardVersion() {
         lastModified: new Date().getTime(),
         rowCount: 0,
         dataHash: 0,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        eventDriven: true
       }
     })).setMimeType(ContentService.MimeType.JSON);
   }
@@ -2262,3 +2314,47 @@ function getDashboardSheetData(sheet) {
     return []; // Return empty array instead of throwing
   }
 }
+
+// ========================================
+// EVENT-DRIVEN DASHBOARD SYSTEM
+// ========================================
+
+/**
+ * PRODUCTION SUMMARY SHEET CHANGE TRIGGER
+ * This function runs automatically when Production Summary sheet is edited
+ * DASHBOARD-ONLY - DOES NOT AFFECT ORIGINAL LOGGING FUNCTIONS
+ */
+/**
+ * Invalidate dashboard cache when data changes
+ * DASHBOARD-ONLY FUNCTION
+ */
+function invalidateDashboardCache() {
+  try {
+    const scriptCache = PropertiesService.getScriptProperties();
+    const documentCache = PropertiesService.getDocumentProperties();
+    
+    // Clear version cache to force fresh data
+    scriptCache.deleteProperty('dashboardVersionCache');
+    
+    // Clear data caches (new for 10-20s polling optimization)
+    documentCache.deleteProperty('dashboardActiveJobsCache');
+    
+    // Set invalidation flag with timestamp
+    scriptCache.setProperty('dashboardInvalidated', JSON.stringify({
+      timestamp: new Date().getTime(),
+      reason: 'Production Summary edited'
+    }));
+    
+    console.log('🗑️ Dashboard cache invalidated due to data change (version + data caches cleared)');
+  } catch (error) {
+    console.error('Cache invalidation failed:', error);
+  }
+}
+
+/**
+ * Check for changes in Production Summary sheet (called by time-based trigger)
+ * This is more reliable than edit triggers and works with caching
+ * DASHBOARD-ONLY FUNCTION
+ */
+
+

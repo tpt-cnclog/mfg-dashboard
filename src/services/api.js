@@ -119,6 +119,31 @@ class ManufacturingAPI {
   }
 
   /**
+   * Install event trigger for real-time updates
+   * DASHBOARD-ONLY FUNCTION - SETS UP EVENT-DRIVEN SYSTEM
+   */
+  async installEventTrigger() {
+    try {
+      const response = await this.apiClient.get(`${API_CONFIG.BASE_URL}?action=installTrigger`);
+      
+      if (response.data && response.data.success) {
+        return {
+          success: true,
+          message: response.data.message
+        };
+      } else {
+        throw new Error(response.data?.error || 'Failed to install event trigger');
+      }
+    } catch (error) {
+      console.error('Error installing event trigger:', error);
+      return {
+        success: false,
+        error: this.getErrorMessage(error)
+      };
+    }
+  }
+
+  /**
    * Get all jobs (including completed ones)
    */
   async getAllJobs() {

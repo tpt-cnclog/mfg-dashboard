@@ -88,9 +88,7 @@ const Dashboard = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   
-  // Smart polling state - DASHBOARD ONLY, NO INTERFERENCE WITH ORIGINAL FUNCTIONS
-  const [lastDataVersion, setLastDataVersion] = useState(null);
-  const [versionCheckFailed, setVersionCheckFailed] = useState(false);
+  // Simple 30-second polling cycle - reliable and straightforward
 
   const fetchActiveJobs = useCallback(async () => {
 
@@ -143,88 +141,22 @@ const Dashboard = () => {
     }
   }, []);
 
-  // Smart polling version check - DASHBOARD ONLY FUNCTION WITH MULTI-USER OPTIMIZATION
-  const checkDataVersion = useCallback(async () => {
-    try {
-      const versionResult = await manufacturingAPI.getDataVersion();
-      
-      if (versionResult.success && versionResult.version) {
-        const currentVersion = versionResult.version;
-        
-        // Check if data has changed (compare hash and timestamp)
-        if (!lastDataVersion || 
-            currentVersion.dataHash !== lastDataVersion.dataHash ||
-            currentVersion.rowCount !== lastDataVersion.rowCount) {
-          
-          console.log('📊 Data version changed - fetching fresh data', {
-            oldHash: lastDataVersion?.dataHash,
-            newHash: currentVersion.dataHash,
-            oldRows: lastDataVersion?.rowCount,
-            newRows: currentVersion.rowCount,
-            cached: versionResult.cached || false
-          });
-          
-          // Data has changed, fetch new data
-          await fetchActiveJobs();
-          setLastDataVersion(currentVersion);
-          setVersionCheckFailed(false);
-        } else {
-          // Data hasn't changed, just update the version check timestamp
-          setLastDataVersion(currentVersion);
-          setVersionCheckFailed(false);
-          if (versionResult.cached) {
-            console.log('📦 Version check - no changes (cached)');
-          }
-        }
-      } else {
-        console.warn('Version check failed, falling back to regular polling');
-        setVersionCheckFailed(true);
-      }
-    } catch (err) {
-      // Handle rate limiting gracefully
-      if (err.message.includes('quota') || err.message.includes('rate') || err.message.includes('limit')) {
-        console.warn('⚠️ Rate limit detected, increasing polling interval:', err.message);
-        setVersionCheckFailed(true); // This will trigger slower fallback polling
-      } else {
-        console.warn('Version check error, falling back to regular polling:', err.message);
-        setVersionCheckFailed(true);
-      }
-    }
-  }, [lastDataVersion, fetchActiveJobs]);
-
   // Initial data fetch
   useEffect(() => {
     fetchActiveJobs();
   }, [fetchActiveJobs]);
 
-  // Smart Polling System - DASHBOARD ONLY, NO INTERFERENCE WITH ORIGINAL FUNCTIONS
+  // Simple 30-second polling system - back to basics for reliability
   useEffect(() => {
-    if (versionCheckFailed) {
-      // Fallback to traditional polling if version checks fail
-      console.log('🔄 Using fallback polling (30s) due to version check failures');
-      
-      // Randomize fallback interval to distribute load (25-35 seconds)
-      const randomFallbackInterval = 25000 + Math.random() * 10000;
-      const fallbackInterval = setInterval(() => {
-        fetchActiveJobs();
-      }, randomFallbackInterval);
+    console.log('🔄 Using simple 30-second polling cycle');
+    
+    // Simple, consistent 30-second interval
+    const pollingInterval = setInterval(() => {
+      fetchActiveJobs();
+    }, 30000); // 30 seconds
 
-      return () => clearInterval(fallbackInterval);
-    } else {
-      // Use smart polling - randomized version checks to prevent polling storms
-      console.log('⚡ Using smart polling with randomized intervals');
-      
-      // Randomize smart polling interval (4-6 seconds) to distribute load across users
-      const randomSmartInterval = 4000 + Math.random() * 2000;
-      console.log(`📊 Smart polling interval: ${(randomSmartInterval/1000).toFixed(1)}s`);
-      
-      const smartInterval = setInterval(() => {
-        checkDataVersion();
-      }, randomSmartInterval);
-
-      return () => clearInterval(smartInterval);
-    }
-  }, [versionCheckFailed, fetchActiveJobs, checkDataVersion]);
+    return () => clearInterval(pollingInterval);
+  }, [fetchActiveJobs]);
 
   // Header visibility based on scroll
   useEffect(() => {
