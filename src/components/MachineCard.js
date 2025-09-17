@@ -21,10 +21,7 @@ const MachineCard = ({ job }) => {
     statusLED,
     // Enhanced status information
     machines,
-    aggregateStatus,
-    statusDetail,
-    statusBadgeColor,
-    processStatusInfo
+    aggregateStatus
   } = job;
 
   const formatTime = (timeString) => {
@@ -40,9 +37,9 @@ const MachineCard = ({ job }) => {
         });
       }
       // Handle CSV format "28/7/2025, 9:57:15"
-      const [datePart, timePart] = timeString.split(', ');
-      if (timePart) {
-        return timePart;
+      const parts = timeString.split(', ');
+      if (parts[1]) {
+        return parts[1];
       }
       return timeString;
     } catch (error) {
