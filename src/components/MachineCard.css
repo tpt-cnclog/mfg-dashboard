@@ -473,3 +473,16 @@
 .dashboard-container.fullscreen .machine-card .job-details {
   margin-bottom: 4px;
 }
+
+/* Specifically target Process Age elements */
+.dashboard-container.fullscreen .machine-card .process-age-label {
+  font-size: 0.5em !important;
+}
+
+.dashboard-container.fullscreen .machine-card .process-age-inline {
+  font-size: 0.5em !important;
+}
+
+.dashboard-container.fullscreen .machine-card .process-age-inline .age-value {
+  font-size: 0.5em !important;
+}
