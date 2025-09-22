@@ -631,8 +631,8 @@
 .dashboard-container.fullscreen .machine-card {
   min-height: 180px;
   height: 100%;
-  font-size: 0.8em;
-  padding: 8px;
+  font-size: 0.75em;
+  padding: 6px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -641,14 +641,14 @@
 
 /* Consistent text sizes for fullscreen on all displays */
 .dashboard-container.fullscreen .machine-id {
-  font-size: 1.1em;
-  margin-bottom: 6px;
+  font-size: 1.0em;
+  margin-bottom: 4px;
 }
 
 .dashboard-container.fullscreen .job-title {
-  font-size: 0.9em;
-  line-height: 1.2;
-  margin-bottom: 6px;
+  font-size: 0.85em;
+  line-height: 1.1;
+  margin-bottom: 4px;
 }
 
 .dashboard-container.fullscreen .time-label,
@@ -656,17 +656,17 @@
 .dashboard-container.fullscreen .time-date,
 .dashboard-container.fullscreen .time-time,
 .dashboard-container.fullscreen .age-value {
-  font-size: 0.7em;
+  font-size: 0.65em;
 }
 
 .dashboard-container.fullscreen .process-info,
 .dashboard-container.fullscreen .project-info {
-  font-size: 0.75em;
-  margin-bottom: 2px;
+  font-size: 0.7em;
+  margin-bottom: 1px;
 }
 
 .dashboard-container.fullscreen .quantity {
-  font-size: 0.7em;
+  font-size: 0.65em;
 }
 
 /* Hide scroll hint in fullscreen */

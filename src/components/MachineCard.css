@@ -403,3 +403,42 @@
     font-size: 0.8em;
   }
 }
+
+/* Fullscreen optimizations for better text fitting */
+.dashboard-container.fullscreen .machine-card .project-info {
+  padding-top: 4px;
+  margin-top: 2px;
+}
+
+.dashboard-container.fullscreen .machine-card .project-no {
+  font-size: 0.6em;
+  line-height: 1.1;
+}
+
+.dashboard-container.fullscreen .machine-card .timing-info {
+  margin-bottom: 4px;
+}
+
+.dashboard-container.fullscreen .machine-card .job-specs {
+  margin-top: 4px;
+  gap: 4px;
+}
+
+.dashboard-container.fullscreen .machine-card .drawing,
+.dashboard-container.fullscreen .machine-card .quantity {
+  font-size: 0.6em;
+  padding: 2px 4px;
+}
+
+.dashboard-container.fullscreen .machine-card .process-info {
+  padding: 4px 6px;
+  margin-bottom: 4px;
+}
+
+.dashboard-container.fullscreen .machine-card .process-label {
+  font-size: 0.6em;
+}
+
+.dashboard-container.fullscreen .machine-card .process-value {
+  font-size: 0.75em;
+}

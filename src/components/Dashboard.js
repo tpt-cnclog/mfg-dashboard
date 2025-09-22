@@ -96,6 +96,15 @@ const Dashboard = () => {
     return optimalColumns;
   };
   
+  // Calculate text scale factor based on number of cards
+  const getTextScaleFactor = (cardCount) => {
+    if (cardCount <= 6) return 1.0;      // Normal size for 6 or fewer cards
+    if (cardCount <= 8) return 0.9;      // Slightly smaller for 7-8 cards
+    if (cardCount <= 12) return 0.75;    // Smaller for 9-12 cards
+    if (cardCount <= 16) return 0.65;    // Even smaller for 13-16 cards
+    return 0.55;                         // Smallest for 17+ cards
+  };
+  
   // Simple 30-second polling cycle - reliable and straightforward
 
   const fetchActiveJobs = useCallback(async () => {
@@ -458,7 +467,8 @@ const Dashboard = () => {
             <div 
               className="jobs-grid"
               style={isFullscreen ? {
-                gridTemplateColumns: `repeat(${calculateGridColumns(jobs.length)}, 1fr)`
+                gridTemplateColumns: `repeat(${calculateGridColumns(jobs.length)}, 1fr)`,
+                fontSize: `${getTextScaleFactor(jobs.length)}em`
               } : {}}
             >
               {jobs.map((job, index) => (
