@@ -466,6 +466,12 @@
   gap: 2px;
 }
 
+/* Make machine number bigger for TV display */
+.dashboard-container.fullscreen .machine-card .machine-id {
+  font-size: 1.2em !important;
+  font-weight: bold;
+}
+
 .dashboard-container.fullscreen .machine-card .age-value {
   font-size: 0.6em !important;
 }
