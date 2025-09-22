@@ -140,11 +140,19 @@ const Dashboard = () => {
           };
         });
 
-        // Sort by start time (latest to oldest)
+        // Sort by process start time (latest to oldest)
         const sortedJobs = transformedJobs.sort((a, b) => {
+          // Debug logging for sort
+          console.log('Sorting data - Job A:', a.partName, 'startTime:', a.startTime);
+          console.log('Sorting data - Job B:', b.partName, 'startTime:', b.startTime);
+          
           const dateA = new Date(a.startTime);
           const dateB = new Date(b.startTime);
-          return dateB - dateA; // Latest first
+          
+          console.log('Parsed dates - A:', dateA, 'B:', dateB);
+          console.log('Sort result:', dateB - dateA);
+          
+          return dateB - dateA; // Latest process start first
         });
         
         setJobs(sortedJobs);
