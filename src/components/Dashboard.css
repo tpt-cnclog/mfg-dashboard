@@ -612,25 +612,26 @@
 
 /* Consistent fullscreen layout for all displays */
 .dashboard-container.fullscreen .jobs-grid {
-  gap: 8px;
+  gap: 6px;
   max-width: none;
-  padding: 8px;
-  height: calc(100vh - 16px);
-  overflow-y: auto;
+  padding: 6px;
+  height: calc(100vh - 12px);
+  overflow: hidden;
   box-sizing: border-box;
   margin: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  grid-auto-rows: minmax(220px, auto);
-  align-content: start;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-auto-rows: 1fr;
+  align-content: stretch;
+  justify-content: stretch;
 }
 
 /* Consistent machine cards for fullscreen on all displays */
 .dashboard-container.fullscreen .machine-card {
-  min-height: 220px;
-  height: auto;
-  font-size: 0.9em;
-  padding: 12px;
+  min-height: 180px;
+  height: 100%;
+  font-size: 0.8em;
+  padding: 8px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -639,14 +640,14 @@
 
 /* Consistent text sizes for fullscreen on all displays */
 .dashboard-container.fullscreen .machine-id {
-  font-size: 1.3em;
-  margin-bottom: 8px;
+  font-size: 1.1em;
+  margin-bottom: 6px;
 }
 
 .dashboard-container.fullscreen .job-title {
-  font-size: 1.0em;
-  line-height: 1.3;
-  margin-bottom: 8px;
+  font-size: 0.9em;
+  line-height: 1.2;
+  margin-bottom: 6px;
 }
 
 .dashboard-container.fullscreen .time-label,
@@ -654,17 +655,17 @@
 .dashboard-container.fullscreen .time-date,
 .dashboard-container.fullscreen .time-time,
 .dashboard-container.fullscreen .age-value {
-  font-size: 0.8em;
+  font-size: 0.7em;
 }
 
 .dashboard-container.fullscreen .process-info,
 .dashboard-container.fullscreen .project-info {
-  font-size: 0.85em;
+  font-size: 0.75em;
   margin-bottom: 2px;
 }
 
 .dashboard-container.fullscreen .quantity {
-  font-size: 0.8em;
+  font-size: 0.7em;
 }
 
 /* Hide scroll hint in fullscreen */
