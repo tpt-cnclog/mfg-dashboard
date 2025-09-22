@@ -614,7 +614,7 @@
 .dashboard-container.fullscreen .jobs-grid {
   gap: 6px;
   max-width: none;
-  padding: 6px 6px 50px 6px;
+  padding: 6px 6px 25px 6px;
   height: calc(100vh - 12px);
   overflow: hidden;
   box-sizing: border-box;
@@ -629,7 +629,7 @@
 
 /* Consistent machine cards for fullscreen on all displays */
 .dashboard-container.fullscreen .machine-card {
-  min-height: 185px;
+  min-height: 170px;
   height: 100%;
   font-size: 0.75em;
   padding: 6px;
