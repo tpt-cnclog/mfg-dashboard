@@ -503,10 +503,11 @@
 }
 
 .dashboard-main.fullscreen-main {
-  padding: 20px;
+  padding: 0;
   height: 100vh;
-  overflow-y: auto;
-  padding-top: 20px; /* No header space needed */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .fullscreen-button {
@@ -611,60 +612,57 @@
 
 /* Fullscreen grid optimization for TV displays */
 .dashboard-container.fullscreen .jobs-grid {
-  gap: 20px;
+  gap: 8px;
   max-width: none;
-  padding: 20px;
-  height: calc(100vh - 40px);
-  overflow: hidden; /* Remove scrolling in fullscreen */
+  padding: 8px;
+  height: calc(100vh - 16px);
+  overflow: hidden;
   box-sizing: border-box;
-}
-
-/* Dynamic grid classes for different job counts */
-.dashboard-container.fullscreen .jobs-grid.grid-1-6 {
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(2, auto);
-}
-
-.dashboard-container.fullscreen .jobs-grid.grid-7-12 {
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(3, auto);
-}
-
-.dashboard-container.fullscreen .jobs-grid.grid-13-20 {
-  grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(4, auto);
-}
-
-.dashboard-container.fullscreen .jobs-grid.grid-21-30 {
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: repeat(5, auto);
-}
-
-.dashboard-container.fullscreen .jobs-grid.grid-many {
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  grid-template-rows: auto;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-auto-rows: minmax(220px, auto);
+  align-content: stretch;
 }
 
 /* Optimize machine cards for fullscreen TV display */
 .dashboard-container.fullscreen .machine-card {
-  min-height: 380px;
+  min-height: 240px;
   height: auto;
   font-size: 0.9em;
   padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 /* Adjust text sizes for TV viewing */
 .dashboard-container.fullscreen .machine-id {
-  font-size: 1.2em;
+  font-size: 1.3em;
+  margin-bottom: 8px;
 }
 
 .dashboard-container.fullscreen .job-title {
-  font-size: 1em;
+  font-size: 1.0em;
+  line-height: 1.3;
+  margin-bottom: 8px;
 }
 
 .dashboard-container.fullscreen .time-label,
-.dashboard-container.fullscreen .age-label {
-  font-size: 0.75em;
+.dashboard-container.fullscreen .age-label,
+.dashboard-container.fullscreen .time-date,
+.dashboard-container.fullscreen .time-time,
+.dashboard-container.fullscreen .age-value {
+  font-size: 0.8em;
+}
+
+.dashboard-container.fullscreen .process-info,
+.dashboard-container.fullscreen .project-info {
+  font-size: 0.85em;
+}
+
+.dashboard-container.fullscreen .quantity {
+  font-size: 0.8em;
 }
 
 /* Hide scroll hint in fullscreen */
