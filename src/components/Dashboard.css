@@ -544,16 +544,16 @@
 
 .exit-fullscreen-btn {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  top: 12px;
+  right: 12px;
   background: rgba(0, 0, 0, 0.7);
   color: white;
   border: none;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 28px;
+  height: 28px;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: bold;
   z-index: 1001;
   transition: all 0.2s ease;
@@ -565,7 +565,7 @@
 
 .exit-fullscreen-btn:hover {
   background: rgba(0, 0, 0, 0.9);
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
 .fullscreen-time-display {
