@@ -88,6 +88,15 @@ const Dashboard = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   
+  // Calculate optimal grid class based on job count for fullscreen TV display
+  const getOptimalGridClass = (jobCount) => {
+    if (jobCount <= 6) return 'grid-1-6';
+    if (jobCount <= 12) return 'grid-7-12';
+    if (jobCount <= 20) return 'grid-13-20';
+    if (jobCount <= 30) return 'grid-21-30';
+    return 'grid-many';
+  };
+
   // Simple 30-second polling cycle - reliable and straightforward
 
   const fetchActiveJobs = useCallback(async () => {
@@ -105,6 +114,7 @@ const Dashboard = () => {
           return {
             ...job,
             machineNo: job.machine || 'No Machine',
+            projectNo: job.projectNo || 'N/A', // Explicitly map project number
             latestProcess: job.process || 'N/A',
             drawingNo: job.drawingNo || 'N/A',
             quantityOrdered: job.quantityOrdered || 0,
@@ -158,6 +168,23 @@ const Dashboard = () => {
 
     return () => clearInterval(pollingInterval);
   }, [fetchActiveJobs]);
+
+  // Dynamic grid layout for fullscreen TV optimization
+  useEffect(() => {
+    if (isFullscreen && jobs.length > 0) {
+      const jobsGrid = document.querySelector('.jobs-grid');
+      if (jobsGrid) {
+        // Remove existing grid classes
+        jobsGrid.classList.remove('grid-1-6', 'grid-7-12', 'grid-13-20', 'grid-21-30', 'grid-many');
+        
+        // Add optimal grid class based on job count
+        const gridClass = getOptimalGridClass(jobs.length);
+        jobsGrid.classList.add(gridClass);
+        
+        console.log(`📺 TV Display: Applied ${gridClass} for ${jobs.length} jobs`);
+      }
+    }
+  }, [jobs.length, isFullscreen]);
 
   // Auto-scroll functionality - only in fullscreen mode
   useEffect(() => {

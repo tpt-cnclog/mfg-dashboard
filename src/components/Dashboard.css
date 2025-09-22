@@ -609,12 +609,62 @@
   }
 }
 
-/* Fullscreen grid optimization */
+/* Fullscreen grid optimization for TV displays */
 .dashboard-container.fullscreen .jobs-grid {
   gap: 20px;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   max-width: none;
-  padding: 0;
+  padding: 20px;
+  height: calc(100vh - 40px);
+  overflow: hidden; /* Remove scrolling in fullscreen */
+  box-sizing: border-box;
+}
+
+/* Dynamic grid classes for different job counts */
+.dashboard-container.fullscreen .jobs-grid.grid-1-6 {
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, auto);
+}
+
+.dashboard-container.fullscreen .jobs-grid.grid-7-12 {
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(3, auto);
+}
+
+.dashboard-container.fullscreen .jobs-grid.grid-13-20 {
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(4, auto);
+}
+
+.dashboard-container.fullscreen .jobs-grid.grid-21-30 {
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(5, auto);
+}
+
+.dashboard-container.fullscreen .jobs-grid.grid-many {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-rows: auto;
+}
+
+/* Optimize machine cards for fullscreen TV display */
+.dashboard-container.fullscreen .machine-card {
+  min-height: 380px;
+  height: auto;
+  font-size: 0.9em;
+  padding: 12px;
+}
+
+/* Adjust text sizes for TV viewing */
+.dashboard-container.fullscreen .machine-id {
+  font-size: 1.2em;
+}
+
+.dashboard-container.fullscreen .job-title {
+  font-size: 1em;
+}
+
+.dashboard-container.fullscreen .time-label,
+.dashboard-container.fullscreen .age-label {
+  font-size: 0.75em;
 }
 
 /* Hide scroll hint in fullscreen */
