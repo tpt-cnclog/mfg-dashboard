@@ -570,60 +570,61 @@
 
 .fullscreen-time-display {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: 8px;
+  right: 8px;
   background: rgba(0, 0, 0, 0.8);
   color: white;
-  padding: 12px 24px;
-  border-radius: 12px;
-  font-size: 16px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
   font-weight: 600;
   z-index: 1001;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   text-align: center;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  min-width: 280px;
-  max-width: 350px;
-  line-height: 1.4;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  min-width: 180px;
+  max-width: 220px;
+  line-height: 1.2;
 }
 
 /* Responsive time display */
 @media (max-width: 768px) {
   .fullscreen-time-display {
-    font-size: 15px;
-    padding: 10px 20px;
-    min-width: 240px;
-    bottom: 15px;
-    right: 15px;
+    font-size: 11px;
+    padding: 5px 10px;
+    min-width: 160px;
+    bottom: 8px;
+    right: 8px;
   }
 }
 
 @media (max-width: 480px) {
   .fullscreen-time-display {
-    font-size: 14px;
-    padding: 8px 16px;
-    min-width: 200px;
-    bottom: 10px;
-    right: 10px;
+    font-size: 10px;
+    padding: 4px 8px;
+    min-width: 140px;
+    bottom: 6px;
+    right: 6px;
   }
 }
 
-/* Consistent fullscreen layout for all displays */
+/* Consistent fullscreen layout for all displays - 2 rows adaptive */
 .dashboard-container.fullscreen .jobs-grid {
   gap: 6px;
   max-width: none;
-  padding: 6px;
+  padding: 6px 6px 50px 6px;
   height: calc(100vh - 12px);
   overflow: hidden;
   box-sizing: border-box;
   margin: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  grid-auto-rows: 1fr;
+  grid-template-rows: 1fr 1fr;
+  grid-auto-flow: column;
   align-content: stretch;
   justify-content: stretch;
+  /* grid-template-columns will be set dynamically via JavaScript */
 }
 
 /* Consistent machine cards for fullscreen on all displays */

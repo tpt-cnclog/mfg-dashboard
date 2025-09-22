@@ -88,6 +88,14 @@ const Dashboard = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   
+  // Dynamic grid calculation for 2-row layout
+  const calculateGridColumns = (cardCount) => {
+    if (cardCount === 0) return 1;
+    // Calculate optimal columns for 2 rows
+    const optimalColumns = Math.ceil(cardCount / 2);
+    return optimalColumns;
+  };
+  
   // Simple 30-second polling cycle - reliable and straightforward
 
   const fetchActiveJobs = useCallback(async () => {
@@ -447,7 +455,12 @@ const Dashboard = () => {
           </div>
         ) : (
           <>
-            <div className="jobs-grid">
+            <div 
+              className="jobs-grid"
+              style={isFullscreen ? {
+                gridTemplateColumns: `repeat(${calculateGridColumns(jobs.length)}, 1fr)`
+              } : {}}
+            >
               {jobs.map((job, index) => (
                 <MachineCard 
                   key={`${job.machineNo}-${job.projectNo}-${index}`} 
