@@ -481,8 +481,38 @@
 
 .dashboard-container.fullscreen .machine-card .process-age-inline {
   font-size: 0.5em !important;
+  display: inline-flex;
+  gap: 4px;
+  margin-left: 8px;
 }
 
 .dashboard-container.fullscreen .machine-card .process-age-inline .age-value {
+  font-size: 0.5em !important;
+}
+
+/* Make time-details a single line */
+.dashboard-container.fullscreen .machine-card .time-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.dashboard-container.fullscreen .machine-card .datetime-info {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+/* Reduce date and time text sizes */
+.dashboard-container.fullscreen .machine-card .time-date {
+  font-size: 0.5em !important;
+}
+
+.dashboard-container.fullscreen .machine-card .time-time {
+  font-size: 0.5em !important;
+}
+
+.dashboard-container.fullscreen .machine-card .time-label {
   font-size: 0.5em !important;
 }
