@@ -88,6 +88,57 @@ const Dashboard = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   
+  // Global sort function for consistent job ordering
+  const sortJobs = useCallback((jobsToSort) => {
+    return [...jobsToSort].sort((a, b) => {
+      // Helper function to parse dates robustly
+      const parseDate = (dateStr) => {
+        if (!dateStr) return new Date(0);
+        
+        let date = new Date(dateStr);
+        if (!isNaN(date.getTime())) return date;
+        
+        // Try parsing Thai format: DD/MM/YYYY HH:mm
+        const thaiMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})$/);
+        if (thaiMatch) {
+          const day = parseInt(thaiMatch[1]);
+          const month = parseInt(thaiMatch[2]) - 1;
+          const year = parseInt(thaiMatch[3]);
+          const hour = parseInt(thaiMatch[4]);
+          const minute = parseInt(thaiMatch[5]);
+          date = new Date(year, month, day, hour, minute);
+          if (!isNaN(date.getTime())) return date;
+        }
+        
+        return new Date(0);
+      };
+      
+      const dateA = parseDate(a.startTime);
+      const dateB = parseDate(b.startTime);
+      
+      // Primary sort: by date (latest first)
+      const dateDiff = dateB.getTime() - dateA.getTime();
+      if (dateDiff !== 0) return dateDiff;
+      
+      // Secondary sort: by machine name for consistent ordering
+      const machineA = (a.machineNo || '').toString();
+      const machineB = (b.machineNo || '').toString();
+      return machineA.localeCompare(machineB);
+    });
+  }, []);
+  
+  // Ensure jobs stay sorted whenever they change
+  useEffect(() => {
+    if (jobs.length > 0) {
+      const sorted = sortJobs(jobs);
+      // Only update if the order actually changed
+      const orderChanged = JSON.stringify(sorted.map(j => j.machineNo)) !== JSON.stringify(jobs.map(j => j.machineNo));
+      if (orderChanged) {
+        setJobs(sorted);
+      }
+    }
+  }, [jobs, sortJobs]);
+  
   // Dynamic grid calculation for 2-row layout
   const calculateGridColumns = (cardCount) => {
     if (cardCount === 0) return 1;
@@ -140,20 +191,8 @@ const Dashboard = () => {
           };
         });
 
-        // Sort by process start time (latest to oldest)
-        const sortedJobs = transformedJobs.sort((a, b) => {
-          // Debug logging for sort
-          console.log('Sorting data - Job A:', a.partName, 'startTime:', a.startTime);
-          console.log('Sorting data - Job B:', b.partName, 'startTime:', b.startTime);
-          
-          const dateA = new Date(a.startTime);
-          const dateB = new Date(b.startTime);
-          
-          console.log('Parsed dates - A:', dateA, 'B:', dateB);
-          console.log('Sort result:', dateB - dateA);
-          
-          return dateB - dateA; // Latest process start first
-        });
+        // Use global sort function for consistent ordering
+        const sortedJobs = sortJobs(transformedJobs);
         
         setJobs(sortedJobs);
         setLastUpdated(new Date());
@@ -166,7 +205,7 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [sortJobs]);
 
   // Initial data fetch
   useEffect(() => {
@@ -189,6 +228,15 @@ const Dashboard = () => {
   useEffect(() => {
     console.log('Auto-scroll functionality disabled');
   }, [isFullscreen]);
+
+  // Re-sort jobs when fullscreen mode changes to ensure correct order
+  useEffect(() => {
+    if (jobs.length > 0) {
+      console.log('🔄 Fullscreen state changed, re-sorting jobs');
+      const sortedJobs = sortJobs(jobs);
+      setJobs(sortedJobs);
+    }
+  }, [isFullscreen, sortJobs]);
 
   // Header visibility based on scroll
   useEffect(() => {
@@ -481,7 +529,7 @@ const Dashboard = () => {
             >
               {jobs.map((job, index) => (
                 <MachineCard 
-                  key={`${job.machineNo}-${job.projectNo}-${index}`} 
+                  key={`${job.machineNo}-${job.projectNo}-${job.startTime}-${index}`} 
                   job={job} 
                 />
               ))}
