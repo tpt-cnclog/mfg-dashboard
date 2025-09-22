@@ -629,7 +629,7 @@
 
 /* Consistent machine cards for fullscreen on all displays */
 .dashboard-container.fullscreen .machine-card {
-  min-height: 180px;
+  min-height: 200px;
   height: 100%;
   font-size: 0.75em;
   padding: 6px;
@@ -666,6 +666,11 @@
 }
 
 .dashboard-container.fullscreen .quantity {
+  font-size: 0.65em;
+}
+
+/* Reduce status text size */
+.dashboard-container.fullscreen .status-text {
   font-size: 0.65em;
 }
 

@@ -442,3 +442,18 @@
 .dashboard-container.fullscreen .machine-card .process-value {
   font-size: 0.75em;
 }
+
+.dashboard-container.fullscreen .machine-card .customer {
+  font-size: 0.6em;
+  padding: 2px 4px;
+}
+
+.dashboard-container.fullscreen .machine-card .customer-info {
+  margin-bottom: 4px;
+}
+
+.dashboard-container.fullscreen .machine-card .part-name {
+  font-size: 0.8em;
+  line-height: 1.1;
+  margin-bottom: 3px;
+}
