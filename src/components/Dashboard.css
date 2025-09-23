@@ -641,7 +641,7 @@
 
 /* Consistent text sizes for fullscreen on all displays */
 .dashboard-container.fullscreen .machine-id {
-  font-size: 1.0em;
+  font-size: 1.6em;
   margin-bottom: 2px;
 }
 
