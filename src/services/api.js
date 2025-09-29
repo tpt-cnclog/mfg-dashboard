@@ -3,7 +3,7 @@ import axios from 'axios';
 // Configuration
 const API_CONFIG = {
   // Replace this with your Google Apps Script Web App URL
-  BASE_URL: 'https://script.google.com/macros/s/AKfycbx7ld5mQfVZAloeJMcufoubwuhsKbbIm4hCnDqiW5CPEUtK8pQIO68Lp4vkDT2HFVd05w/exec',
+  BASE_URL: 'https://script.google.com/macros/s/AKfycbyL5QIDhNd5ct1CXiyIVVHnMPhJnk0HtLyc3bAJPJcuftg2gJlrajDSnODs-rbbctcK/exec',
   REFRESH_INTERVAL: 30000, // 30 seconds (fallback)
   VERSION_CHECK_INTERVAL: 5000, // 5 seconds for version checks
 };
