@@ -183,10 +183,7 @@ const Dashboard = () => {
               return 'Paused';
             }
             
-            // For non-paused jobs, show "On Process" (with or without downtime for context)
-            if (downtime && downtime.trim()) {
-              return `On Process: ${downtime}`;
-            }
+            // For non-paused jobs, just show "On Process" (no downtime reasons)
             return 'On Process';
           };
           
