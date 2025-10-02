@@ -170,6 +170,26 @@ const Dashboard = () => {
           // Parse process status for enhanced machine status
           const statusInfo = parseProcessStatus(job.processStatus, job.machine);
           
+          // Generate enhanced status text with downtime reason
+          const getStatusText = (processStatus, aggregateStatus, downtime) => {
+            // Check if there's any pause in the job
+            const hasPause = processStatus === 'PAUSE' || 
+                           (typeof processStatus === 'string' && processStatus.includes('PAUSE')) ||
+                           (typeof aggregateStatus === 'string' && aggregateStatus.includes('PAUSE')) || 
+                           aggregateStatus === 'PAUSED';
+            
+            if (hasPause) {
+              // For paused jobs, just show "Paused" (reason will be in the banner)
+              return 'Paused';
+            }
+            
+            // For non-paused jobs, show "On Process" (with or without downtime for context)
+            if (downtime && downtime.trim()) {
+              return `On Process: ${downtime}`;
+            }
+            return 'On Process';
+          };
+          
           return {
             ...job,
             machineNo: job.machine || 'No Machine',
@@ -179,8 +199,10 @@ const Dashboard = () => {
             quantityOrdered: job.quantityOrdered || 0,
             projectStartDate: job.projectStartDate, // Explicitly pass through project start date
             statusLED: {
-              color: 'green',
-              text: 'On Process'
+              color: (job.processStatus === 'PAUSE' || 
+                     (typeof job.processStatus === 'string' && job.processStatus.includes('PAUSE')) ||
+                     (typeof statusInfo.aggregate === 'string' && statusInfo.aggregate.includes('PAUSE'))) ? 'orange' : 'green',
+              text: getStatusText(job.processStatus, statusInfo.aggregate, job.downtime)
             },
             // Enhanced status information
             processStatusInfo: statusInfo,

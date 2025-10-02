@@ -342,7 +342,8 @@ function getDashboardSheetData(sheet) {
       stepNo: Math.max(headers.indexOf('Step No'), headers.indexOf('Step No.')),
       startTime: Math.max(headers.indexOf('Start Time'), headers.indexOf('Start time')),
       operator: Math.max(headers.indexOf('Operator'), -1), // No operator column in CSV
-      processStatus: Math.max(headers.indexOf('PROCESS STATUS'), headers.indexOf('Process Status'))
+      processStatus: Math.max(headers.indexOf('PROCESS STATUS'), headers.indexOf('Process Status')),
+      downtime: headers.indexOf('Downtime')
     };
     
     // Debug: Log headers and column indices
@@ -374,6 +375,7 @@ function getDashboardSheetData(sheet) {
         startTime: row[colIndices.startTime] || '',
         operator: row[colIndices.operator] || '',
         processStatus: row[colIndices.processStatus] || '',
+        downtime: row[colIndices.downtime] || '',
         rowIndex: i + 1
       };
       

@@ -20,6 +20,7 @@ const MachineCard = ({ job }) => {
     projectNo,
     status,
     statusLED,
+    downtime, // Add downtime from job data
     // Enhanced status information
     machines,
     aggregateStatus,
@@ -142,7 +143,7 @@ const MachineCard = ({ job }) => {
       return null; // Don't show badge for normal operation
     }
     
-    const badgeText = getBadgeText(aggregateStatus);
+    const badgeText = getBadgeText(aggregateStatus, downtime);
     const badgeClass = getBadgeClass(aggregateStatus);
     
     return (
@@ -152,14 +153,14 @@ const MachineCard = ({ job }) => {
     );
   };
 
-  // Render status indicator - hide "On Process" when paused
+  // Render status indicator - hide when paused (info is in banner)
   const renderStatusIndicator = () => {
-    // If there are paused machines, don't show the "On Process" status
+    // If there are paused machines, don't show the status indicator (info is in the banner)
     if (aggregateStatus && (aggregateStatus.includes('PAUSE') || aggregateStatus === 'PAUSED')) {
       return null;
     }
     
-    // Show normal "On Process" status for active machines
+    // Show status indicator for active machines
     return (
       <div className="status-indicator">
         <span 
@@ -179,10 +180,12 @@ const MachineCard = ({ job }) => {
     return 'unknown';
   };
 
-  const getBadgeText = (aggregateStatus) => {
+  const getBadgeText = (aggregateStatus, downtime) => {
     switch (aggregateStatus) {
-      case 'PARTIAL_PAUSE': return 'PARTIAL PAUSE';
-      case 'PAUSED': return 'PAUSED';
+      case 'PARTIAL_PAUSE': 
+        return downtime && downtime.trim() ? `PARTIAL PAUSE: ${downtime}` : 'PARTIAL PAUSE';
+      case 'PAUSED': 
+        return downtime && downtime.trim() ? `PAUSED: ${downtime}` : 'PAUSED';
       case 'OVERTIME': return 'OVERTIME';
       default: return aggregateStatus;
     }
