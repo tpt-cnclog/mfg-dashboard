@@ -170,8 +170,10 @@
 }
 
 .dashboard-main {
-  padding: 100px 10px 20px 10px;
+  padding: 100px 15px 20px 15px;
   overflow-x: auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Scroll hint */
@@ -196,13 +198,15 @@
 }
 
 .jobs-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(2, auto);
+  display: flex;
+  flex-wrap: wrap;
   gap: 15px;
   margin-top: 20px;
-  padding: 0 0 20px 0;
+  padding: 0;
   overflow-y: auto;
+  justify-content: space-evenly;
+  align-items: flex-start;
+  width: 100%;
 }
 
 .jobs-grid::-webkit-scrollbar {
@@ -416,77 +420,60 @@
   line-height: 1.4;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .header-content {
-    flex-direction: column;
-    gap: 15px;
-    text-align: center;
+/* Clean Responsive Design - ONLY for normal mode, NOT fullscreen */
+/* Large screens - more cards per row */
+/* Responsive breakpoints for jobs grid */
+@media (min-width: 1400px) {
+  .dashboard-container:not(.fullscreen) .jobs-grid {
+    gap: 20px;
   }
   
-  .header-left {
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .dashboard-controls {
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .dashboard-main {
-    padding: 10px 5px;
-  }
-  
-  .jobs-grid {
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: auto;
-    padding: 0 0 20px 0;
-    gap: 10px;
-  }
-  
-  .machine-card {
-    min-height: 280px;
-    padding: 12px;
-  }
-  
-  .dashboard-title {
-    font-size: 24px;
-  }
-  
-  .config-card {
-    padding: 30px 20px;
+  .dashboard-container:not(.fullscreen) .dashboard-main {
+    padding: 100px 20px 20px 20px;
   }
 }
 
-@media (max-width: 480px) {
-  .dashboard-main {
-    padding: 15px 5px;
+/* Large screens */
+@media (min-width: 1200px) and (max-width: 1399px) {
+  .dashboard-container:not(.fullscreen) .jobs-grid {
+    gap: 18px;
   }
   
-  .header-left {
-    flex-direction: column;
-    gap: 8px;
+  .dashboard-container:not(.fullscreen) .dashboard-main {
+    padding: 100px 18px 20px 18px;
+  }
+}
+
+/* Medium-large screens */
+@media (min-width: 900px) and (max-width: 1199px) {
+  .dashboard-container:not(.fullscreen) .jobs-grid {
+    gap: 16px;
   }
   
-  .dashboard-logo {
-    height: 40px;
+  .dashboard-container:not(.fullscreen) .dashboard-main {
+    padding: 100px 16px 20px 16px;
   }
-  
-  .logo-placeholder {
-    font-size: 24px;
-    width: 40px;
-    height: 40px;
-  }
-  
-  .jobs-grid {
-    grid-template-columns: 1fr;
+}
+
+/* Medium screens */
+@media (min-width: 600px) and (max-width: 899px) {
+  .dashboard-container:not(.fullscreen) .jobs-grid {
     gap: 15px;
   }
   
-  .machine-card {
-    min-height: 220px;
-    padding: 15px;
+  .dashboard-container:not(.fullscreen) .dashboard-main {
+    padding: 100px 15px 20px 15px;
+  }
+}
+
+/* Small screens */
+@media (max-width: 599px) {
+  .dashboard-container:not(.fullscreen) .jobs-grid {
+    gap: 12px;
+  }
+  
+  .dashboard-container:not(.fullscreen) .dashboard-main {
+    padding: 100px 12px 20px 12px;
   }
 }
 
@@ -503,9 +490,11 @@
 }
 
 .dashboard-main.fullscreen-main {
+  position: relative;
   padding: 0;
   height: 100vh;
   overflow: hidden;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
 }
@@ -570,108 +559,268 @@
 
 .fullscreen-time-display {
   position: fixed;
-  bottom: 8px;
-  right: 8px;
-  background: rgba(0, 0, 0, 0.8);
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.85);
   color: white;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 9px;
-  font-weight: 600;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
   z-index: 1001;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(15px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
   text-align: center;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  min-width: 140px;
-  max-width: 180px;
-  line-height: 1.1;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  min-width: 200px;
+  line-height: 1.3;
 }
 
-/* Responsive time display */
+/* Responsive time display - Bottom center positioning */
 @media (max-width: 768px) {
   .fullscreen-time-display {
-    font-size: 8px;
-    padding: 3px 6px;
-    min-width: 120px;
-    bottom: 8px;
-    right: 8px;
+    font-size: 14px;
+    padding: 10px 16px;
+    min-width: 180px;
+    bottom: 10px;
+  }
+  
+  .dashboard-container.fullscreen .jobs-grid {
+    bottom: 50px !important;
   }
 }
 
 @media (max-width: 480px) {
   .fullscreen-time-display {
-    font-size: 7px;
-    padding: 2px 4px;
-    min-width: 100px;
-    bottom: 6px;
-    right: 6px;
+    font-size: 12px;
+    padding: 8px 14px;
+    min-width: 160px;
+    bottom: 8px;
+  }
+  
+  .dashboard-container.fullscreen .jobs-grid {
+    bottom: 45px !important;
   }
 }
 
-/* Consistent fullscreen layout for all displays - 2 rows adaptive */
+/* Fullscreen layout - Fixed 2 rows, equal-width columns */
 .dashboard-container.fullscreen .jobs-grid {
-  gap: 6px;
-  max-width: none;
-  padding: 6px 6px 25px 6px;
-  height: calc(100vh - 12px);
-  overflow: hidden;
-  box-sizing: border-box;
-  margin: 0;
-  display: grid;
-  grid-template-rows: 1fr 1fr;
-  grid-auto-flow: row;
-  align-content: stretch;
-  justify-content: stretch;
-  /* grid-template-columns will be set dynamically via JavaScript */
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 60px !important;
+  display: grid !important;
+  gap: 8px !important;
+  padding: 8px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  grid-template-rows: 1fr 1fr !important;
+  grid-auto-flow: column !important;
+  grid-auto-columns: 1fr !important;
+  align-content: stretch !important;
+  justify-content: stretch !important;
+  overflow: hidden !important;
+  flex: none !important;
+  width: auto !important;
+  height: auto !important;
 }
 
-/* Consistent machine cards for fullscreen on all displays */
+/* Fullscreen machine cards - fill grid cells completely */
 .dashboard-container.fullscreen .machine-card {
-  min-height: 170px;
-  height: 100%;
-  font-size: 0.75em;
-  padding: 6px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  overflow: hidden;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+  font-size: 1em !important;
+  padding: 12px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  flex: none !important;
 }
 
-/* Consistent text sizes for fullscreen on all displays */
+/* Fullscreen text sizes - Maintain normal mode hierarchy with proportional scaling */
 .dashboard-container.fullscreen .machine-id {
-  font-size: 1.6em;
-  margin-bottom: 2px;
+  font-size: 1.8em !important;
+  margin-bottom: 8px !important;
+  font-weight: bold !important;
 }
 
-.dashboard-container.fullscreen .job-title {
-  font-size: 0.8em;
-  line-height: 1.0;
-  margin-bottom: 3px;
+.dashboard-container.fullscreen .part-name {
+  font-size: 1.1em !important;
+  line-height: 1.2 !important;
+  margin-bottom: 8px !important;
+  font-weight: bold !important;
+}
+
+.dashboard-container.fullscreen .status-text {
+  font-size: 0.9em !important;
+  font-weight: 500 !important;
 }
 
 .dashboard-container.fullscreen .time-label,
-.dashboard-container.fullscreen .age-label,
-.dashboard-container.fullscreen .time-date,
-.dashboard-container.fullscreen .time-time,
+.dashboard-container.fullscreen .age-label {
+  font-size: 0.8em !important;
+  font-weight: 600 !important;
+}
+
+.dashboard-container.fullscreen .time-date {
+  font-size: 0.85em !important;
+  font-weight: 500 !important;
+}
+
+.dashboard-container.fullscreen .time-time {
+  font-size: 0.9em !important;
+  font-weight: bold !important;
+}
+
 .dashboard-container.fullscreen .age-value {
-  font-size: 0.35em;
+  font-size: 0.85em !important;
+  font-weight: bold !important;
 }
 
-.dashboard-container.fullscreen .process-info,
-.dashboard-container.fullscreen .project-info {
-  font-size: 0.65em;
-  margin-bottom: 1px;
+.dashboard-container.fullscreen .process-label {
+  font-size: 0.8em !important;
+  font-weight: 600 !important;
 }
 
-.dashboard-container.fullscreen .quantity {
-  font-size: 0.6em;
+.dashboard-container.fullscreen .process-value {
+  font-size: 1.0em !important;
+  font-weight: bold !important;
 }
 
-/* Reduce status text size */
-.dashboard-container.fullscreen .status-text {
-  font-size: 0.6em;
+.dashboard-container.fullscreen .quantity,
+.dashboard-container.fullscreen .drawing {
+  font-size: 0.85em !important;
+  padding: 4px 8px !important;
+}
+
+.dashboard-container.fullscreen .customer {
+  font-size: 0.9em !important;
+  padding: 4px 8px !important;
+  font-weight: 600 !important;
+}
+
+.dashboard-container.fullscreen .project-no {
+  font-size: 0.7em !important;
+}
+
+/* Fullscreen responsive breakpoints - Override everything with !important */
+/* All screen sizes - Fixed 2-row layout with equal columns */
+.dashboard-container.fullscreen .jobs-grid {
+  grid-template-rows: 1fr 1fr !important;
+  grid-auto-flow: column !important;
+  grid-auto-columns: 1fr !important;
+  align-content: stretch !important;
+  justify-content: stretch !important;
+}
+
+/* Large screens - More space, proportional text scaling */
+@media (min-width: 1200px) {
+  .dashboard-container.fullscreen .jobs-grid {
+    gap: 16px !important;
+    padding: 16px !important;
+  }
+  
+  .dashboard-container.fullscreen .machine-card {
+    font-size: 1.1em !important;
+    padding: 18px !important;
+  }
+  
+  .dashboard-container.fullscreen .machine-id {
+    font-size: 2.0em !important;
+  }
+  
+  .dashboard-container.fullscreen .part-name {
+    font-size: 1.2em !important;
+  }
+  
+  .dashboard-container.fullscreen .status-text {
+    font-size: 1.0em !important;
+  }
+  
+  .dashboard-container.fullscreen .process-value {
+    font-size: 1.1em !important;
+  }
+  
+  .dashboard-container.fullscreen .customer {
+    font-size: 1.0em !important;
+  }
+}
+
+/* Medium screens - Balanced scaling */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .dashboard-container.fullscreen .jobs-grid {
+    gap: 14px !important;
+    padding: 14px !important;
+  }
+  
+  .dashboard-container.fullscreen .machine-card {
+    font-size: 1.0em !important;
+    padding: 16px !important;
+  }
+  
+  .dashboard-container.fullscreen .machine-id {
+    font-size: 1.8em !important;
+  }
+  
+  .dashboard-container.fullscreen .part-name {
+    font-size: 1.1em !important;
+  }
+  
+  .dashboard-container.fullscreen .status-text {
+    font-size: 0.9em !important;
+  }
+  
+  .dashboard-container.fullscreen .process-value {
+    font-size: 1.0em !important;
+  }
+  
+  .dashboard-container.fullscreen .customer {
+    font-size: 0.9em !important;
+  }
+}
+
+/* Small screens - Still force 2 rows, but allow single column if needed */
+@media (max-width: 767px) {
+  .dashboard-container.fullscreen .jobs-grid {
+    gap: 12px !important;
+    padding: 12px !important;
+    grid-template-rows: 1fr 1fr !important;
+    grid-auto-flow: column !important;
+  }
+  
+  .dashboard-container.fullscreen .machine-card {
+    font-size: 1.3em !important;
+    padding: 16px !important;
+  }
+  
+  .dashboard-container.fullscreen .machine-id {
+    font-size: 2.2em !important;
+  }
+  
+  .dashboard-container.fullscreen .part-name {
+    font-size: 1.3em !important;
+  }
+  
+  .dashboard-container.fullscreen .status-text {
+    font-size: 1.1em !important;
+  }
+  
+  .dashboard-container.fullscreen .process-value {
+    font-size: 1.2em !important;
+  }
+  
+  .dashboard-container.fullscreen .customer {
+    font-size: 1.1em !important;
+  }
 }
 
 /* Hide scroll hint in fullscreen */

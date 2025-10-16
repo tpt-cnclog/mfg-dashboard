@@ -139,21 +139,33 @@ const Dashboard = () => {
     }
   }, [jobs, sortJobs]);
   
-  // Dynamic grid calculation for 2-row layout
+  // Simple and effective grid calculation for fullscreen
   const calculateGridColumns = (cardCount) => {
     if (cardCount === 0) return 1;
-    // Calculate optimal columns for 2 rows
-    const optimalColumns = Math.ceil(cardCount / 2);
-    return optimalColumns;
+    
+    const screenWidth = window.innerWidth;
+    
+    // For mobile, always use 1 column
+    if (screenWidth < 768) return 1;
+    
+    // For larger screens, calculate based on card count and screen width
+    if (cardCount <= 2) return cardCount;
+    if (cardCount <= 4) return Math.min(2, cardCount);
+    if (cardCount <= 6) return 3;
+    if (cardCount <= 8) return 4;
+    if (cardCount <= 12) return 4;
+    if (cardCount <= 16) return 4;
+    return 5; // Maximum 5 columns for very large numbers
   };
   
-  // Calculate text scale factor based on number of cards
+  // Simplified text scaling
   const getTextScaleFactor = (cardCount) => {
-    if (cardCount <= 6) return 1.0;      // Normal size for 6 or fewer cards
-    if (cardCount <= 8) return 0.9;      // Slightly smaller for 7-8 cards
-    if (cardCount <= 12) return 0.75;    // Smaller for 9-12 cards
-    if (cardCount <= 16) return 0.65;    // Even smaller for 13-16 cards
-    return 0.55;                         // Smallest for 17+ cards
+    // Let CSS handle most of the responsive scaling
+    // This is just for fine-tuning based on density
+    if (cardCount <= 4) return 1.0;
+    if (cardCount <= 8) return 0.95;
+    if (cardCount <= 12) return 0.9;
+    return 0.85;
   };
   
   // Simple 30-second polling cycle - reliable and straightforward
@@ -191,7 +203,7 @@ const Dashboard = () => {
             ...job,
             machineNo: job.machine || 'No Machine',
             projectNo: job.projectNo || 'N/A', // Explicitly map project number
-            latestProcess: job.process || 'N/A',
+            latestProcess: job.process || job.onProcess || job.latestProcess || 'N/A',
             drawingNo: job.drawingNo || 'N/A',
             quantityOrdered: job.quantityOrdered || 0,
             projectStartDate: job.projectStartDate, // Explicitly pass through project start date

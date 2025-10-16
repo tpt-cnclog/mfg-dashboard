@@ -215,7 +215,7 @@ const MachineCard = ({ job }) => {
         </div>
         <div className="process-step">
           <span className="process-label">Process No:</span>
-          <span className="process-value">{processNo || 'N/A'}</span>
+          <span className="process-value">{processNo || stepNo || '1'}</span>
         </div>
         <div className="process-step">
           <span className="process-label">Step:</span>
@@ -247,10 +247,6 @@ const MachineCard = ({ job }) => {
               <span className="age-value">{calculateJobAge(startTime)}</span>
             </div>
           </div>
-        </div>
-        <div className="job-age">
-          <span className="age-label">Job Age:</span>
-          <span className="age-value">{calculateJobAge(projectStartDate || startTime)}</span>
         </div>
       </div>
 
