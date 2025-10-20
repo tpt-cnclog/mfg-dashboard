@@ -571,7 +571,8 @@
 .fullscreen-time-display {
   position: fixed;
   bottom: 8px;
-  right: 8px;
+  left: 50%;
+  transform: translateX(-50%);
   background: rgba(0, 0, 0, 0.8);
   color: white;
   padding: 4px 8px;
@@ -584,9 +585,11 @@
   text-align: center;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  min-width: 140px;
-  max-width: 180px;
+  min-width: 200px;
+  max-width: 300px;
   line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 /* Responsive time display */
@@ -594,9 +597,11 @@
   .fullscreen-time-display {
     font-size: 8px;
     padding: 3px 6px;
-    min-width: 120px;
+    min-width: 180px;
+    max-width: 250px;
     bottom: 8px;
-    right: 8px;
+    left: 50%;
+    transform: translateX(-50%);
   }
 }
 
@@ -604,9 +609,11 @@
   .fullscreen-time-display {
     font-size: 7px;
     padding: 2px 4px;
-    min-width: 100px;
+    min-width: 150px;
+    max-width: 200px;
     bottom: 6px;
-    right: 6px;
+    left: 50%;
+    transform: translateX(-50%);
   }
 }
 
@@ -667,10 +674,7 @@
   font-size: 0.6em;
 }
 
-.dashboard-container.fullscreen .project-no {
-  font-size: 0.55em;
-  padding: 1px 4px;
-}
+
 
 .dashboard-container.fullscreen .job-status-badge {
   font-size: 0.5em;

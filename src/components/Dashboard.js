@@ -503,10 +503,10 @@ const Dashboard = () => {
 
   const formatCurrentTime = (date) => {
     const options = {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
+      weekday: 'short',
       day: 'numeric',
+      month: 'short',
+      year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',

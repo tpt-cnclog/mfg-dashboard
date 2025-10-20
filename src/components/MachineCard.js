@@ -18,7 +18,6 @@ const MachineCard = ({ job }) => {
     stepNo,
     startTime,
     projectStartDate,
-    projectNo,
     status,
     statusLED,
     downtime, // Add downtime from job data
@@ -218,7 +217,6 @@ const MachineCard = ({ job }) => {
           <span className="customer">{customer}</span>
         </div>
         <div className="job-details">
-          <span className="project-no">Project: {projectNo}</span>
           <span className="drawing">Drawing: {drawingNo || 'N/A'}</span>
           <span className="quantity">Qty: {quantityOrdered || 0}</span>
         </div>

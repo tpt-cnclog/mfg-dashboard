@@ -1,14 +1,14 @@
 .process-card {
   background: #f8f9fa;
   border: 1px solid #e9ecef;
-  border-radius: 8px;
-  padding: 4px !important;
-  min-height: 30px !important;
+  border-radius: 4px;
+  padding: 1px !important;
+  min-height: 9px !important;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   transition: all 0.2s ease;
-  font-size: 0.85em;
+  font-size: 0.75em;
 }
 
 .process-card:hover {
@@ -39,7 +39,7 @@
 
 /* Header section */
 .process-header {
-  margin-bottom: 4px;
+  margin-bottom: 1px;
 }
 
 .machine-status-line {
@@ -107,14 +107,14 @@
 
 /* Process information */
 .process-info {
-  margin-bottom: 2px;
+  margin-bottom: 1px;
 }
 
 .process-details {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1px;
+  margin-bottom: 0px;
   width: 100%;
 }
 
@@ -123,9 +123,12 @@
 .process-right {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 1px;
   flex: 1;
   text-align: center;
+  min-height: 5px !important;
+  max-height: 5px !important;
+  height: 5px !important;
 }
 
 .process-left {
@@ -146,23 +149,35 @@
 .process-label,
 .process-no-label,
 .step-label {
-  font-size: 0.7em !important;
+  font-size: 0.55em !important;
   color: #6c757d !important;
+  line-height: 0.7 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .process-name,
 .process-number,
 .step-value {
-  font-size: 0.75em !important;
+  font-size: 0.6em !important;
   color: #495057 !important;
   font-weight: 500 !important;
+  line-height: 0.8 !important;
+  padding: 0px 1px !important;
+  height: 5px !important;
+  max-height: 5px !important;
+  min-height: 5px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 /* Timing information */
 .timing-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0px;
 }
 
 .date-row {
@@ -246,67 +261,70 @@
 
 /* Fullscreen mode adjustments */
 .dashboard-container.fullscreen .process-card {
-  font-size: 0.7em !important;
-  min-height: 25px !important;
-  padding: 2px !important;
+  font-size: 0.65em !important;
+  min-height: 12px !important;
+  padding: 1px !important;
 }
 
 .dashboard-container.fullscreen .machine-name {
-  font-size: 0.8em !important;
+  font-size: 0.75em !important;
 }
 
 .dashboard-container.fullscreen .process-name {
-  font-size: 0.65em !important;
+  font-size: 0.6em !important;
 }
 
 .dashboard-container.fullscreen .process-number {
-  font-size: 0.65em !important;
-  padding: 1px 3px !important;
+  font-size: 0.6em !important;
+  padding: 0px 2px !important;
 }
 
 .dashboard-container.fullscreen .step-label,
 .dashboard-container.fullscreen .step-value,
 .dashboard-container.fullscreen .process-label,
 .dashboard-container.fullscreen .process-no-label {
-  font-size: 0.65em !important;
+  font-size: 0.58em !important;
+  line-height: 0.9 !important;
 }
 
 .dashboard-container.fullscreen .time-label,
 .dashboard-container.fullscreen .due-label {
-  font-size: 0.6em !important;
+  font-size: 0.55em !important;
   color: #6c757d !important;
   font-weight: 500 !important;
   text-transform: uppercase !important;
+  line-height: 0.9 !important;
 }
 
 .dashboard-container.fullscreen .time-value,
 .dashboard-container.fullscreen .due-value {
-  font-size: 0.6em !important;
+  font-size: 0.55em !important;
   color: #495057 !important;
   font-weight: 600 !important;
+  line-height: 0.9 !important;
 }
 
 .dashboard-container.fullscreen .pause-status,
 .dashboard-container.fullscreen .ot-status {
-  font-size: 0.6em !important;
-  padding: 1px 2px !important;
+  font-size: 0.55em !important;
+  padding: 0px 2px !important;
 }
 
 .dashboard-container.fullscreen .machine-status-line {
-  gap: 2px !important;
+  gap: 1px !important;
 }
 
 /* Very compact mode for 4+ process cards in fullscreen */
 .dashboard-container.fullscreen .process-cards-container:has(> .process-card:nth-child(4)) .process-card {
-  font-size: 0.6em !important;
-  min-height: 20px !important;
-  padding: 1px !important;
+  font-size: 0.55em !important;
+  min-height: 10px !important;
+  padding: 0px !important;
 }
 
 .dashboard-container.fullscreen .process-cards-container:has(> .process-card:nth-child(4)) .machine-name {
-  font-size: 0.7em !important;
+  font-size: 0.65em !important;
 }
 
 .dashboard-container.fullscreen .process-cards-container:has(> .process-card:nth-child(4)) .duration-value {
-  font-size: 0.6em !important;
+  font-size: 0.55em !important;
 }
