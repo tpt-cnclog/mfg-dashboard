@@ -343,7 +343,12 @@ function getDashboardSheetData(sheet) {
       startTime: Math.max(headers.indexOf('Start Time'), headers.indexOf('Start time')),
       operator: Math.max(headers.indexOf('Operator'), -1), // No operator column in CSV
       processStatus: Math.max(headers.indexOf('PROCESS STATUS'), headers.indexOf('Process Status')),
-      downtime: headers.indexOf('Downtime')
+      downtime: headers.indexOf('Downtime'),
+      dueDate: Math.max(
+        headers.indexOf('วันที่ควรจะเสร็จ Due Date'),
+        headers.indexOf('Due Date'),
+        headers.findIndex(h => h && h.includes('Due Date'))
+      )
     };
     
     // Debug: Log headers and column indices
@@ -376,6 +381,7 @@ function getDashboardSheetData(sheet) {
         operator: row[colIndices.operator] || '',
         processStatus: row[colIndices.processStatus] || '',
         downtime: row[colIndices.downtime] || '',
+        dueDate: row[colIndices.dueDate] || '',
         rowIndex: i + 1
       };
       

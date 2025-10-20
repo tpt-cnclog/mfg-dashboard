@@ -6,14 +6,11 @@
   border: 1px solid #e0e0e0;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   min-height: 320px;
-  flex: 1 1 calc(25% - 15px);
-  min-width: 250px;
-  max-width: 350px;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 12px;
   overflow: hidden;
-  box-sizing: border-box;
 }
 
 .machine-card:hover {
@@ -21,23 +18,98 @@
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-.machine-header {
+/* Job Header */
+.job-header {
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 10px;
+}
+
+.job-title {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 8px;
 }
 
-.machine-info {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.machine-id {
-  font-size: 22px;
+.job-title .part-name {
+  font-size: 18px;
   font-weight: bold;
   color: #2c3e50;
+  flex: 1;
+}
+
+.job-title .customer {
+  font-size: 14px;
+  color: #007bff;
+  font-weight: 500;
+  text-align: right;
+  max-width: 40%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.job-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.job-details .project-no,
+.job-details .drawing,
+.job-details .quantity {
+  font-size: 11px;
+  color: #495057;
+  background: #f8f9fa;
+  padding: 3px 6px;
+  border-radius: 4px;
+  border: 1px solid #e9ecef;
+  flex-shrink: 0;
+  height: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.job-details .drawing {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Job Status Badge */
+.job-status-badge {
+  margin-top: 8px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.job-status-badge.paused {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.job-status-badge.overtime {
+  background: #cce5ff;
+  color: #004085;
+  border: 1px solid #99d6ff;
+}
+
+/* Process Cards Container */
+.process-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+  flex: 1;
+  align-content: start;
 }
 
 .status-indicator {
@@ -205,15 +277,6 @@
   font-weight: bold;
 }
 
-.job-age {
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid #f0f0f0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 .process-age-inline {
   display: flex;
   align-items: center;
@@ -237,22 +300,6 @@
   border: 1px solid #bee5eb;
 }
 
-.age-label {
-  font-size: 12px;
-  color: #6c757d;
-  font-weight: 500;
-}
-
-.age-value {
-  font-size: 13px;
-  color: #28a745;
-  font-weight: bold;
-  background: #f8f9fa;
-  padding: 2px 8px;
-  border-radius: 12px;
-  border: 1px solid #e9ecef;
-}
-
 .project-info {
   border-top: 1px solid #e9ecef;
   padding-top: 10px;
@@ -264,44 +311,12 @@
   font-family: monospace;
 }
 
-/* Simplified Responsive Design for Cards */
-/* Large screens - 4 cards per row */
-@media (min-width: 1200px) {
+/* Responsive Design */
+@media (max-width: 768px) {
   .machine-card {
-    flex: 1 1 calc(25% - 15px);
-    max-width: calc(25% - 15px);
-  }
-  
-  .machine-id {
-    font-size: 24px;
-  }
-  
-  .part-name {
-    font-size: 16px;
-  }
-}
-
-/* Medium-large screens - 3 cards per row */
-@media (min-width: 900px) and (max-width: 1199px) {
-  .machine-card {
-    flex: 1 1 calc(33.333% - 15px);
-    max-width: calc(33.333% - 15px);
-  }
-  
-  .machine-id {
-    font-size: 22px;
-  }
-  
-  .part-name {
-    font-size: 15px;
-  }
-}
-
-/* Medium screens - 2 cards per row */
-@media (min-width: 600px) and (max-width: 899px) {
-  .machine-card {
-    flex: 1 1 calc(50% - 15px);
-    max-width: calc(50% - 15px);
+    margin: 10px;
+    padding: 15px;
+    min-height: auto;
   }
   
   .machine-id {
@@ -309,50 +324,12 @@
   }
   
   .part-name {
-    font-size: 14px;
-    line-height: 1.3;
+    font-size: 16px;
   }
   
-  .status-text {
-    font-size: 12px;
-  }
-  
-  .customer-info {
-    font-size: 13px;
-  }
-}
-
-/* Small screens - 1 card per row */
-@media (max-width: 599px) {
-  .machine-card {
-    flex: 1 1 100%;
-    max-width: 100%;
-    min-width: unset;
-  }
-  
-  .machine-id {
-    font-size: 18px;
-  }
-  
-  .part-name {
-    font-size: 13px;
-    line-height: 1.2;
-  }
-  
-  .status-text {
-    font-size: 11px;
-  }
-  
-  .customer-info {
-    font-size: 12px;
-  }
-  
-  .process-info {
-    gap: 6px;
-  }
-  
-  .info-item {
-    padding: 6px 8px;
+  .job-specs {
+    flex-direction: column;
+    gap: 5px;
   }
 }
 
@@ -477,89 +454,79 @@
   }
 }
 
-/* Fullscreen optimizations - Maintain normal hierarchy with proportional scaling */
-.dashboard-container.fullscreen .machine-card .project-info {
-  padding-top: 6px;
-  margin-top: 4px;
+/* Fullscreen optimizations for new job header + process cards layout */
+.dashboard-container.fullscreen .machine-card {
+  gap: 3px;
 }
 
-.dashboard-container.fullscreen .machine-card .project-no {
-  font-size: 0.7em !important;
-  line-height: 1.2;
+.dashboard-container.fullscreen .job-header {
+  padding-bottom: 3px;
 }
 
-.dashboard-container.fullscreen .machine-card .timing-info {
-  margin-bottom: 8px;
+.dashboard-container.fullscreen .job-title {
+  margin-bottom: 2px;
 }
 
-.dashboard-container.fullscreen .machine-card .job-specs {
-  margin-top: 6px;
-  gap: 8px;
+.dashboard-container.fullscreen .job-title .part-name {
+  font-size: 0.9em;
+  line-height: 1.0;
 }
 
-.dashboard-container.fullscreen .machine-card .process-info {
-  padding: 8px;
-  margin-bottom: 10px;
+.dashboard-container.fullscreen .job-title .customer {
+  font-size: 0.7em;
 }
 
-.dashboard-container.fullscreen .machine-card .customer-info {
-  margin-bottom: 6px;
+.dashboard-container.fullscreen .job-details {
+  margin-bottom: 2px;
 }
 
-.dashboard-container.fullscreen .machine-card .machine-header {
-  margin-bottom: 10px;
+.dashboard-container.fullscreen .job-details .drawing,
+.dashboard-container.fullscreen .job-details .quantity {
+  font-size: 0.6em;
 }
 
-.dashboard-container.fullscreen .machine-card .machine-info {
-  gap: 6px;
+.dashboard-container.fullscreen .project-info {
+  margin-bottom: 2px;
 }
 
-.dashboard-container.fullscreen .machine-card .job-details {
-  margin-bottom: 10px;
+.dashboard-container.fullscreen .project-no {
+  font-size: 0.55em;
+  padding: 1px 4px;
 }
 
-/* Process Age elements - maintain hierarchy */
-.dashboard-container.fullscreen .machine-card .process-age-label {
-  font-size: 0.7em !important;
+.dashboard-container.fullscreen .job-status-badge {
+  font-size: 0.5em;
+  padding: 2px 4px;
+  margin-top: 2px;
 }
 
-.dashboard-container.fullscreen .machine-card .process-age-inline {
-  font-size: 0.7em !important;
-  display: inline-flex;
-  gap: 4px;
-  margin-left: 6px;
-  white-space: nowrap;
+/* Process Cards Container */
+.dashboard-container.fullscreen .process-cards-container {
+  gap: 3px;
+  grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+}
+.dashboard-container.fullscreen .machine-card .time-date {
+  font-size: 0.35em !important;
 }
 
-.dashboard-container.fullscreen .machine-card .process-age-inline .age-value {
-  font-size: 0.85em !important;
-  padding: 2px 6px;
+.dashboard-container.fullscreen .machine-card .time-time {
+  font-size: 0.35em !important;
 }
 
-/* Time details layout optimization */
-.dashboard-container.fullscreen .machine-card .time-details {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: nowrap;
+.dashboard-container.fullscreen .machine-card .time-label {
+  font-size: 0.35em !important;
 }
 
-.dashboard-container.fullscreen .machine-card .datetime-info {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-
-/* Status badge proportional scaling */
+/* Reduce pause status badge size in fullscreen */
 .dashboard-container.fullscreen .machine-card .aggregate-status-badge {
-  font-size: 0.7em !important;
-  padding: 3px 6px;
-  border-radius: 6px;
-  margin: 2px 0 4px 0;
+  font-size: 0.5em !important;
+  padding: 2px 4px;
+  border-radius: 4px;
+  margin: 1px 0 2px 0;
 }
 
 .dashboard-container.fullscreen .machine-card .aggregate-status-badge.paused,
 .dashboard-container.fullscreen .machine-card .aggregate-status-badge.partial-pause {
-  font-size: 0.7em !important;
-  padding: 3px 6px;
+  font-size: 0.5em !important;
+  padding: 2px 4px;
 }

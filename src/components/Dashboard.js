@@ -4,9 +4,18 @@ import manufacturingAPI from '../services/api';
 import './Dashboard.css';
 
 // Enhanced status parsing utility functions
-const parseProcessStatus = (processStatusString, machineString) => {
+const parseProcessStatus = (processStatusString, machineString, processString, processNoString, stepString, startTimeString, dueDateString, downtimeString) => {
   // Debug logging
-  console.log('parseProcessStatus called with:', { processStatusString, machineString });
+  console.log('parseProcessStatus called with:', { 
+    processStatusString, 
+    machineString, 
+    processString, 
+    processNoString, 
+    stepString, 
+    startTimeString,
+    dueDateString,
+    downtimeString 
+  });
   
   if (!processStatusString || !machineString) {
     console.log('Missing data - processStatus:', processStatusString, 'machine:', machineString);
@@ -20,14 +29,67 @@ const parseProcessStatus = (processStatusString, machineString) => {
   // Parse comma-separated values, handle quoted strings
   const statuses = processStatusString.replace(/"/g, '').split(',').map(s => s.trim().toUpperCase());
   const machines = machineString.replace(/"/g, '').split(',').map(m => m.trim());
+  const processes = processString ? processString.replace(/"/g, '').split(',').map(p => p.trim()) : [];
+  const processNumbers = processNoString ? processNoString.replace(/"/g, '').split(',').map(p => p.trim()) : [];
+  const steps = stepString ? stepString.replace(/"/g, '').split(',').map(s => s.trim()) : [];
   
-  // Create machine-status pairs
+  // Special handling for start times - they come as "date, time, date, time" format
+  // We need to recombine them into proper datetime strings
+  const rawStartTimes = startTimeString ? startTimeString.replace(/"/g, '').split(',').map(t => t.trim()) : [];
+  const startTimes = [];
+  for (let i = 0; i < rawStartTimes.length; i += 2) {
+    if (i + 1 < rawStartTimes.length) {
+      // Combine date and time parts
+      startTimes.push(`${rawStartTimes[i]}, ${rawStartTimes[i + 1]}`);
+    } else {
+      // If odd number, just use what we have
+      startTimes.push(rawStartTimes[i]);
+    }
+  }
+  
+  // Same handling for due dates if they have the same format
+  const rawDueDates = dueDateString ? dueDateString.replace(/"/g, '').split(',').map(d => d.trim()) : [];
+  const dueDates = [];
+  for (let i = 0; i < rawDueDates.length; i += 2) {
+    if (i + 1 < rawDueDates.length && rawDueDates[i + 1].includes(':')) {
+      // If next item looks like time, combine them
+      dueDates.push(`${rawDueDates[i]}, ${rawDueDates[i + 1]}`);
+    } else {
+      // Otherwise, just use the date part
+      dueDates.push(rawDueDates[i]);
+    }
+  }
+  
+  const downtimes = downtimeString ? downtimeString.replace(/"/g, '').split(',').map(d => d.trim()) : [];
+  
+  // Create machine-status pairs with full process details
   const machineStatuses = machines.map((machine, index) => ({
     name: machine,
     status: statuses[index] || 'UNKNOWN',
+    processName: processes[index] || 'N/A',
+    processNumber: processNumbers[index] || 'N/A',
+    stepNumber: steps[index] || 'N/A',
+    startTime: startTimes[index] || startTimeString,
+    dueDate: dueDates[index] || dueDateString,
+    downtime: '', // Will be assigned based on status below
     color: getStatusColor(statuses[index] || 'UNKNOWN'),
     emoji: getStatusEmoji(statuses[index] || 'UNKNOWN')
   }));
+  
+  // Assign downtime reasons to paused machines
+  const pausedMachineIndices = machineStatuses
+    .map((machine, index) => machine.status.includes('PAUSE') ? index : -1)
+    .filter(index => index !== -1);
+  
+  // Distribute downtime reasons to paused machines
+  pausedMachineIndices.forEach((machineIndex, downtimeIndex) => {
+    if (downtimeIndex < downtimes.length && downtimes[downtimeIndex]) {
+      machineStatuses[machineIndex].downtime = downtimes[downtimeIndex];
+    } else if (downtimes.length > 0 && downtimes[0]) {
+      // If there are fewer downtime reasons than paused machines, use the first one
+      machineStatuses[machineIndex].downtime = downtimes[0];
+    }
+  });
   
   // Count status types
   const pausedMachines = machineStatuses.filter(m => m.status.includes('PAUSE'));
@@ -139,33 +201,21 @@ const Dashboard = () => {
     }
   }, [jobs, sortJobs]);
   
-  // Simple and effective grid calculation for fullscreen
+  // Dynamic grid calculation for 2-row layout
   const calculateGridColumns = (cardCount) => {
     if (cardCount === 0) return 1;
-    
-    const screenWidth = window.innerWidth;
-    
-    // For mobile, always use 1 column
-    if (screenWidth < 768) return 1;
-    
-    // For larger screens, calculate based on card count and screen width
-    if (cardCount <= 2) return cardCount;
-    if (cardCount <= 4) return Math.min(2, cardCount);
-    if (cardCount <= 6) return 3;
-    if (cardCount <= 8) return 4;
-    if (cardCount <= 12) return 4;
-    if (cardCount <= 16) return 4;
-    return 5; // Maximum 5 columns for very large numbers
+    // Calculate optimal columns for 2 rows
+    const optimalColumns = Math.ceil(cardCount / 2);
+    return optimalColumns;
   };
   
-  // Simplified text scaling
+  // Calculate text scale factor based on number of cards
   const getTextScaleFactor = (cardCount) => {
-    // Let CSS handle most of the responsive scaling
-    // This is just for fine-tuning based on density
-    if (cardCount <= 4) return 1.0;
-    if (cardCount <= 8) return 0.95;
-    if (cardCount <= 12) return 0.9;
-    return 0.85;
+    if (cardCount <= 6) return 1.0;      // Normal size for 6 or fewer cards
+    if (cardCount <= 8) return 0.9;      // Slightly smaller for 7-8 cards
+    if (cardCount <= 12) return 0.75;    // Smaller for 9-12 cards
+    if (cardCount <= 16) return 0.65;    // Even smaller for 13-16 cards
+    return 0.55;                         // Smallest for 17+ cards
   };
   
   // Simple 30-second polling cycle - reliable and straightforward
@@ -180,7 +230,16 @@ const Dashboard = () => {
         // Transform API data to match MachineCard expectations
         const transformedJobs = result.data.map(job => {
           // Parse process status for enhanced machine status
-          const statusInfo = parseProcessStatus(job.processStatus, job.machine);
+          const statusInfo = parseProcessStatus(
+            job.processStatus, 
+            job.machine,
+            job.process,
+            job.processNo,
+            job.stepNo,
+            job.startTime,
+            job.dueDate,
+            job.downtime
+          );
           
           // Generate enhanced status text with downtime reason
           const getStatusText = (processStatus, aggregateStatus, downtime) => {
@@ -203,10 +262,11 @@ const Dashboard = () => {
             ...job,
             machineNo: job.machine || 'No Machine',
             projectNo: job.projectNo || 'N/A', // Explicitly map project number
-            latestProcess: job.process || job.onProcess || job.latestProcess || 'N/A',
+            latestProcess: job.process || 'N/A',
             drawingNo: job.drawingNo || 'N/A',
             quantityOrdered: job.quantityOrdered || 0,
             projectStartDate: job.projectStartDate, // Explicitly pass through project start date
+            dueDate: job.dueDate, // Include due date
             statusLED: {
               color: (job.processStatus === 'PAUSE' || 
                      (typeof job.processStatus === 'string' && job.processStatus.includes('PAUSE')) ||

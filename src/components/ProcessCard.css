@@ -1,0 +1,312 @@
+.process-card {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 4px !important;
+  min-height: 30px !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+  font-size: 0.85em;
+}
+
+.process-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Status-based styling */
+.process-card.active {
+  border-left: 4px solid #28a745;
+  background: #f8fff9;
+}
+
+.process-card.paused {
+  border-left: 4px solid #dc3545;
+  background: #fff8f8;
+}
+
+.process-card.overtime {
+  border-left: 4px solid #007bff;
+  background: #f8fbff;
+}
+
+.process-card.unknown {
+  border-left: 4px solid #6c757d;
+  background: #f8f9fa;
+}
+
+/* Header section */
+.process-header {
+  margin-bottom: 4px;
+}
+
+.machine-status-line {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.machine-name {
+  font-weight: bold;
+  font-size: 0.9em;
+  color: #2c3e50;
+}
+
+.status-emoji {
+  font-size: 0.8em;
+}
+
+.pause-status {
+  background: #f8d7da;
+  color: #721c24;
+  font-size: 0.7em;
+  font-weight: 600;
+  padding: 1px 4px;
+  border-radius: 3px;
+  border: 1px solid #f5c6cb;
+  text-transform: uppercase;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ot-status {
+  background: #cce5ff;
+  color: #004085;
+  font-size: 0.7em;
+  font-weight: 600;
+  padding: 1px 4px;
+  border-radius: 3px;
+  border: 1px solid #99d6ff;
+  text-transform: uppercase;
+}
+
+/* Downtime reason */
+.downtime-reason {
+  margin-top: 2px;
+  font-size: 0.7em;
+  color: #721c24;
+  background: #f8d7da;
+  padding: 2px 4px;
+  border-radius: 3px;
+  border: 1px solid #f5c6cb;
+}
+
+.downtime-label {
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.downtime-text {
+  font-style: italic;
+}
+
+/* Process information */
+.process-info {
+  margin-bottom: 2px;
+}
+
+.process-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1px;
+  width: 100%;
+}
+
+.process-left,
+.process-center,
+.process-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  text-align: center;
+}
+
+.process-left {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.process-center {
+  justify-content: center;
+  text-align: center;
+}
+
+.process-right {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.process-label,
+.process-no-label,
+.step-label {
+  font-size: 0.7em !important;
+  color: #6c757d !important;
+}
+
+.process-name,
+.process-number,
+.step-value {
+  font-size: 0.75em !important;
+  color: #495057 !important;
+  font-weight: 500 !important;
+}
+
+/* Timing information */
+.timing-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.date-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.start-time,
+.due-date {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  flex: 1 !important;
+  justify-content: center !important;
+  gap: 2px !important;
+}
+
+.time-label,
+.due-label {
+  font-size: 0.65em !important;
+  color: #6c757d !important;
+  font-weight: 500 !important;
+  margin-bottom: 0px !important;
+  text-transform: uppercase !important;
+  display: block !important;
+}
+
+.time-value,
+.due-value {
+  font-size: 0.7em !important;
+  color: #495057 !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+}
+
+.duration {
+  text-align: center;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.duration-label {
+  font-size: 0.65em;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.duration-value {
+  font-size: 0.75em;
+  font-weight: bold;
+  color: #007bff;
+  background: #e3f2fd;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+  .process-card {
+    font-size: 0.8em;
+    min-height: 30px !important;
+    padding: 4px !important;
+  }
+  
+  .machine-name {
+    font-size: 0.85em;
+  }
+  
+  .duration-value {
+    font-size: 0.7em;
+  }
+}
+
+/* Fullscreen mode adjustments */
+.dashboard-container.fullscreen .process-card {
+  font-size: 0.7em !important;
+  min-height: 25px !important;
+  padding: 2px !important;
+}
+
+.dashboard-container.fullscreen .machine-name {
+  font-size: 0.8em !important;
+}
+
+.dashboard-container.fullscreen .process-name {
+  font-size: 0.65em !important;
+}
+
+.dashboard-container.fullscreen .process-number {
+  font-size: 0.65em !important;
+  padding: 1px 3px !important;
+}
+
+.dashboard-container.fullscreen .step-label,
+.dashboard-container.fullscreen .step-value,
+.dashboard-container.fullscreen .process-label,
+.dashboard-container.fullscreen .process-no-label {
+  font-size: 0.65em !important;
+}
+
+.dashboard-container.fullscreen .time-label,
+.dashboard-container.fullscreen .due-label {
+  font-size: 0.6em !important;
+  color: #6c757d !important;
+  font-weight: 500 !important;
+  text-transform: uppercase !important;
+}
+
+.dashboard-container.fullscreen .time-value,
+.dashboard-container.fullscreen .due-value {
+  font-size: 0.6em !important;
+  color: #495057 !important;
+  font-weight: 600 !important;
+}
+
+.dashboard-container.fullscreen .pause-status,
+.dashboard-container.fullscreen .ot-status {
+  font-size: 0.6em !important;
+  padding: 1px 2px !important;
+}
+
+.dashboard-container.fullscreen .machine-status-line {
+  gap: 2px !important;
+}
+
+/* Very compact mode for 4+ process cards in fullscreen */
+.dashboard-container.fullscreen .process-cards-container:has(> .process-card:nth-child(4)) .process-card {
+  font-size: 0.6em !important;
+  min-height: 20px !important;
+  padding: 1px !important;
+}
+
+.dashboard-container.fullscreen .process-cards-container:has(> .process-card:nth-child(4)) .machine-name {
+  font-size: 0.7em !important;
+}
+
+.dashboard-container.fullscreen .process-cards-container:has(> .process-card:nth-child(4)) .duration-value {
+  font-size: 0.6em !important;
+}
