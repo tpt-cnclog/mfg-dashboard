@@ -162,6 +162,71 @@ const MachineCard = ({ job }) => {
     }
   };
 
+  // Helper function to parse date for sorting (same logic as calculateJobAge)
+  const parseStartTime = (startTimeString) => {
+    if (!startTimeString) return new Date(0); // Return epoch for invalid dates
+    
+    try {
+      let startDate;
+      
+      // Handle ISO format from API (2025-08-28T02:43:23.368Z)
+      if (startTimeString.includes('T') && startTimeString.includes('Z')) {
+        startDate = new Date(startTimeString);
+      }
+      // Handle standard date string that JavaScript can parse directly
+      else if (!startTimeString.includes('/') || startTimeString.includes('-')) {
+        startDate = new Date(startTimeString);
+      }
+      // Handle Thai CSV format "28/7/2025, 9:57:15" or similar
+      else if (startTimeString.includes('/')) {
+        const parts = startTimeString.split(/[,\s]+/);
+        const datePart = parts[0];
+        const timePart = parts[1] || '00:00:00';
+        
+        const dateComponents = datePart.split('/');
+        if (dateComponents.length === 3) {
+          let day, month, year;
+          
+          // Try different date formats
+          if (dateComponents[2].length === 4) {
+            // DD/MM/YYYY or MM/DD/YYYY
+            day = parseInt(dateComponents[0]);
+            month = parseInt(dateComponents[1]) - 1; // JavaScript months are 0-indexed
+            year = parseInt(dateComponents[2]);
+          } else {
+            // MM/DD/YY or DD/MM/YY
+            day = parseInt(dateComponents[0]);
+            month = parseInt(dateComponents[1]) - 1;
+            year = parseInt(dateComponents[2]);
+            if (year < 100) year += 2000; // Convert 2-digit year
+          }
+          
+          // Parse time if available
+          const timeComponents = timePart.split(':');
+          const hour = parseInt(timeComponents[0]) || 0;
+          const minute = parseInt(timeComponents[1]) || 0;
+          const second = parseInt(timeComponents[2]) || 0;
+          
+          startDate = new Date(year, month, day, hour, minute, second);
+        }
+      }
+      
+      // Fallback: try JavaScript's built-in parsing
+      if (!startDate || isNaN(startDate.getTime())) {
+        startDate = new Date(startTimeString);
+      }
+      
+      // Final check - return epoch if still invalid
+      if (!startDate || isNaN(startDate.getTime())) {
+        return new Date(0);
+      }
+      
+      return startDate;
+    } catch (error) {
+      return new Date(0); // Return epoch for errors
+    }
+  };
+
   // Parse process data from the machines array
   const parseProcessData = () => {
     if (!machines || machines.length === 0) {
@@ -178,7 +243,8 @@ const MachineCard = ({ job }) => {
       }];
     }
 
-    return machines.map((machine, index) => ({
+    // Map machines to process data
+    const processData = machines.map((machine, index) => ({
       machineName: machine.name,
       processName: machine.processName || latestProcess || 'N/A',
       processNumber: machine.processNumber || processNo || 'N/A',
@@ -190,6 +256,13 @@ const MachineCard = ({ job }) => {
       statusEmoji: machine.emoji,
       statusColor: machine.color
     }));
+
+    // Sort processes by start time (newest first)
+    return processData.sort((a, b) => {
+      const timeA = parseStartTime(a.startTime);
+      const timeB = parseStartTime(b.startTime);
+      return timeB - timeA; // Newest first (descending order)
+    });
   };
 
   const processData = parseProcessData();
@@ -223,7 +296,8 @@ const MachineCard = ({ job }) => {
       </div>
 
       {/* Process Cards Container */}
-      <div className="process-cards-container">
+            {/* Process Cards Container */}
+      <div className={`process-cards-container ${processData.length > 1 ? 'multi-process' : ''}`}>
         {processData.map((process, index) => (
           <ProcessCard 
             key={index}

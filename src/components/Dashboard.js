@@ -47,34 +47,56 @@ const parseProcessStatus = (processStatusString, machineString, processString, p
     }
   }
   
-  // Same handling for due dates if they have the same format
+  // Parse due dates - each machine can have its own due date
   const rawDueDates = dueDateString ? dueDateString.replace(/"/g, '').split(',').map(d => d.trim()) : [];
   const dueDates = [];
-  for (let i = 0; i < rawDueDates.length; i += 2) {
-    if (i + 1 < rawDueDates.length && rawDueDates[i + 1].includes(':')) {
-      // If next item looks like time, combine them
-      dueDates.push(`${rawDueDates[i]}, ${rawDueDates[i + 1]}`);
-    } else {
-      // Otherwise, just use the date part
-      dueDates.push(rawDueDates[i]);
+  
+  // Check if we have date-time pairs or just dates
+  let hasTimePairs = false;
+  for (let i = 0; i < rawDueDates.length - 1; i++) {
+    if (rawDueDates[i + 1] && rawDueDates[i + 1].includes(':') && !rawDueDates[i + 1].includes('/')) {
+      hasTimePairs = true;
+      break;
     }
   }
+  
+  if (hasTimePairs) {
+    // Handle date-time pairs format: "date1, time1, date2, time2"
+    for (let i = 0; i < rawDueDates.length; i += 2) {
+      if (i + 1 < rawDueDates.length && rawDueDates[i + 1].includes(':')) {
+        // If next item looks like time, combine them
+        dueDates.push(`${rawDueDates[i]}, ${rawDueDates[i + 1]}`);
+      } else {
+        // Otherwise, just use the date part
+        dueDates.push(rawDueDates[i]);
+      }
+    }
+  } else {
+    // Handle simple comma-separated dates: "date1, date2, date3"
+    dueDates.push(...rawDueDates.filter(d => d && d !== ''));
+  }
+  
+
   
   const downtimes = downtimeString ? downtimeString.replace(/"/g, '').split(',').map(d => d.trim()) : [];
   
   // Create machine-status pairs with full process details
-  const machineStatuses = machines.map((machine, index) => ({
-    name: machine,
-    status: statuses[index] || 'UNKNOWN',
-    processName: processes[index] || 'N/A',
-    processNumber: processNumbers[index] || 'N/A',
-    stepNumber: steps[index] || 'N/A',
-    startTime: startTimes[index] || startTimeString,
-    dueDate: dueDates[index] || dueDateString,
-    downtime: '', // Will be assigned based on status below
-    color: getStatusColor(statuses[index] || 'UNKNOWN'),
-    emoji: getStatusEmoji(statuses[index] || 'UNKNOWN')
-  }));
+  const machineStatuses = machines.map((machine, index) => {
+    const assignedDueDate = dueDates[index] || dueDateString;
+    
+    return {
+      name: machine,
+      status: statuses[index] || 'UNKNOWN',
+      processName: processes[index] || 'N/A',
+      processNumber: processNumbers[index] || 'N/A',
+      stepNumber: steps[index] || 'N/A',
+      startTime: startTimes[index] || startTimeString,
+      dueDate: assignedDueDate,
+      downtime: '', // Will be assigned based on status below
+      color: getStatusColor(statuses[index] || 'UNKNOWN'),
+      emoji: getStatusEmoji(statuses[index] || 'UNKNOWN')
+    };
+  });
   
   // Assign downtime reasons to paused machines
   const pausedMachineIndices = machineStatuses
@@ -153,32 +175,91 @@ const Dashboard = () => {
   // Global sort function for consistent job ordering
   const sortJobs = useCallback((jobsToSort) => {
     return [...jobsToSort].sort((a, b) => {
-      // Helper function to parse dates robustly
+      // Helper function to parse dates robustly (enhanced for various formats)
       const parseDate = (dateStr) => {
         if (!dateStr) return new Date(0);
         
-        let date = new Date(dateStr);
-        if (!isNaN(date.getTime())) return date;
-        
-        // Try parsing Thai format: DD/MM/YYYY HH:mm
-        const thaiMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})$/);
-        if (thaiMatch) {
-          const day = parseInt(thaiMatch[1]);
-          const month = parseInt(thaiMatch[2]) - 1;
-          const year = parseInt(thaiMatch[3]);
-          const hour = parseInt(thaiMatch[4]);
-          const minute = parseInt(thaiMatch[5]);
-          date = new Date(year, month, day, hour, minute);
+        try {
+          // Handle ISO format from API (2025-08-28T02:43:23.368Z)
+          if (dateStr.includes('T') && dateStr.includes('Z')) {
+            const date = new Date(dateStr);
+            if (!isNaN(date.getTime())) return date;
+          }
+          
+          // Handle standard date string that JavaScript can parse directly
+          if (!dateStr.includes('/') || dateStr.includes('-')) {
+            const date = new Date(dateStr);
+            if (!isNaN(date.getTime())) return date;
+          }
+          
+          // Handle Thai CSV format "28/7/2025, 9:57:15" or similar
+          if (dateStr.includes('/')) {
+            const parts = dateStr.split(/[,\s]+/);
+            const datePart = parts[0];
+            const timePart = parts[1] || '00:00:00';
+            
+            const dateComponents = datePart.split('/');
+            if (dateComponents.length === 3) {
+              let day, month, year;
+              
+              // Try different date formats
+              if (dateComponents[2].length === 4) {
+                // DD/MM/YYYY or MM/DD/YYYY
+                day = parseInt(dateComponents[0]);
+                month = parseInt(dateComponents[1]) - 1; // JavaScript months are 0-indexed
+                year = parseInt(dateComponents[2]);
+              } else {
+                // MM/DD/YY or DD/MM/YY
+                day = parseInt(dateComponents[0]);
+                month = parseInt(dateComponents[1]) - 1;
+                year = parseInt(dateComponents[2]);
+                if (year < 100) year += 2000; // Convert 2-digit year
+              }
+              
+              // Parse time if available
+              const timeComponents = timePart.split(':');
+              const hour = parseInt(timeComponents[0]) || 0;
+              const minute = parseInt(timeComponents[1]) || 0;
+              const second = parseInt(timeComponents[2]) || 0;
+              
+              const date = new Date(year, month, day, hour, minute, second);
+              if (!isNaN(date.getTime())) return date;
+            }
+          }
+          
+          // Fallback: try JavaScript's built-in parsing
+          const date = new Date(dateStr);
           if (!isNaN(date.getTime())) return date;
+        } catch (error) {
+          // Silent fail for invalid dates
         }
         
         return new Date(0);
       };
+
+      // Helper function to find the newest process start time for a job
+      const getNewestProcessStartTime = (job) => {
+        let newestDate = parseDate(job.startTime);
+
+        // Check all machines in the job for newer start times
+        if (job.machines && job.machines.length > 0) {
+          job.machines.forEach(machine => {
+            if (machine.startTime) {
+              const machineDate = parseDate(machine.startTime);
+              if (machineDate.getTime() > newestDate.getTime()) {
+                newestDate = machineDate;
+              }
+            }
+          });
+        }
+
+        return newestDate;
+      };
       
-      const dateA = parseDate(a.startTime);
-      const dateB = parseDate(b.startTime);
+      const dateA = getNewestProcessStartTime(a);
+      const dateB = getNewestProcessStartTime(b);
       
-      // Primary sort: by date (latest first)
+      // Primary sort: by newest process date (latest first)
       const dateDiff = dateB.getTime() - dateA.getTime();
       if (dateDiff !== 0) return dateDiff;
       

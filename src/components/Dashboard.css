@@ -577,7 +577,7 @@
   color: white;
   padding: 4px 8px;
   border-radius: 6px;
-  font-size: 9px;
+  font-size: 14px;
   font-weight: 600;
   z-index: 1001;
   backdrop-filter: blur(10px);
@@ -595,7 +595,7 @@
 /* Responsive time display */
 @media (max-width: 768px) {
   .fullscreen-time-display {
-    font-size: 8px;
+    font-size: 12px;
     padding: 3px 6px;
     min-width: 180px;
     max-width: 250px;
@@ -607,7 +607,7 @@
 
 @media (max-width: 480px) {
   .fullscreen-time-display {
-    font-size: 7px;
+    font-size: 11px;
     padding: 2px 4px;
     min-width: 150px;
     max-width: 200px;

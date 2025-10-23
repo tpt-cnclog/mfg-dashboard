@@ -2,11 +2,11 @@
   background: #f8f9fa;
   border: 1px solid #e9ecef;
   border-radius: 4px;
-  padding: 1px !important;
+  padding: 0px !important;
   min-height: 9px !important;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   transition: all 0.2s ease;
   font-size: 0.75em;
 }
@@ -51,18 +51,18 @@
 
 .machine-name {
   font-weight: bold;
-  font-size: 0.9em;
+  font-size: 1.17em; /* 30% larger than 0.9em */
   color: #2c3e50;
 }
 
 .status-emoji {
-  font-size: 0.8em;
+  font-size: 1.04em; /* 30% larger than 0.8em */
 }
 
 .pause-status {
   background: #f8d7da;
   color: #721c24;
-  font-size: 0.7em;
+  font-size: 0.91em; /* 30% larger than 0.7em */
   font-weight: 600;
   padding: 1px 4px;
   border-radius: 3px;
@@ -77,7 +77,7 @@
 .ot-status {
   background: #cce5ff;
   color: #004085;
-  font-size: 0.7em;
+  font-size: 0.91em; /* 30% larger than 0.7em */
   font-weight: 600;
   padding: 1px 4px;
   border-radius: 3px;
@@ -88,7 +88,7 @@
 /* Downtime reason */
 .downtime-reason {
   margin-top: 2px;
-  font-size: 0.7em;
+  font-size: 0.91em; /* 30% larger than 0.7em */
   color: #721c24;
   background: #f8d7da;
   padding: 2px 4px;
@@ -107,7 +107,7 @@
 
 /* Process information */
 .process-info {
-  margin-bottom: 1px;
+  margin-bottom: 0px;
 }
 
 .process-details {
@@ -149,7 +149,7 @@
 .process-label,
 .process-no-label,
 .step-label {
-  font-size: 0.55em !important;
+  font-size: 0.715em !important; /* 30% larger than 0.55em */
   color: #6c757d !important;
   line-height: 0.7 !important;
   display: flex !important;
@@ -160,7 +160,7 @@
 .process-name,
 .process-number,
 .step-value {
-  font-size: 0.6em !important;
+  font-size: 0.78em !important; /* 30% larger than 0.6em */
   color: #495057 !important;
   font-weight: 500 !important;
   line-height: 0.8 !important;
@@ -178,6 +178,7 @@
   display: flex;
   flex-direction: column;
   gap: 0px;
+  margin-top: -1px;
 }
 
 .date-row {
@@ -188,7 +189,16 @@
   width: 100%;
 }
 
-.start-time,
+.start-time {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  flex: 1 !important;
+  justify-content: center !important;
+  gap: 2px !important;
+}
+
 .due-date {
   display: flex !important;
   flex-direction: column !important;
@@ -199,9 +209,19 @@
   gap: 2px !important;
 }
 
+/* Inline due date - smaller and on single line */
+.due-date-inline {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  margin-top: 3px !important;
+}
+
 .time-label,
 .due-label {
-  font-size: 0.65em !important;
+  font-size: 0.845em !important; /* 30% larger than 0.65em */
   color: #6c757d !important;
   font-weight: 500 !important;
   margin-bottom: 0px !important;
@@ -211,10 +231,66 @@
 
 .time-value,
 .due-value {
-  font-size: 0.7em !important;
+  font-size: 0.91em !important; /* 30% larger than 0.7em */
   color: #495057 !important;
   font-weight: 600 !important;
   line-height: 1.2 !important;
+}
+
+/* Inline due date styling - 30% smaller than start date */
+.due-label-inline {
+  font-size: 0.591em !important; /* 30% larger base, but still smaller than start date */
+  color: #6c757d !important;
+  font-weight: 500 !important;
+  text-transform: uppercase !important;
+}
+
+.due-value-inline {
+  font-size: 0.637em !important; /* 30% larger base, but still smaller than start date */
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+}
+
+/* Due date status colors */
+.due-date.before-due .due-value {
+  color: #28a745 !important; /* Green - before due date */
+  font-weight: 700 !important;
+}
+
+.due-date.due-today .due-value {
+  color: #ffc107 !important; /* Yellow - due today */
+  font-weight: 700 !important;
+}
+
+.due-date.overdue .due-value {
+  color: #dc3545 !important; /* Red - overdue */
+  font-weight: 700 !important;
+}
+
+.due-date.no-due-date .due-value {
+  color: #6c757d !important; /* Light Gray - no due date */
+  font-weight: 500 !important;
+}
+
+/* Inline due date status colors */
+.due-date-inline.before-due .due-value-inline {
+  color: #28a745 !important; /* Green - before due date */
+  font-weight: 700 !important;
+}
+
+.due-date-inline.due-today .due-value-inline {
+  color: #ffc107 !important; /* Yellow - due today */
+  font-weight: 700 !important;
+}
+
+.due-date-inline.overdue .due-value-inline {
+  color: #dc3545 !important; /* Red - overdue */
+  font-weight: 700 !important;
+}
+
+.due-date-inline.no-due-date .due-value-inline {
+  color: #6c757d !important; /* Light Gray - no due date */
+  font-weight: 500 !important;
 }
 
 .duration {
@@ -227,19 +303,40 @@
 }
 
 .duration-label {
-  font-size: 0.65em;
+  font-size: 0.845em; /* 30% larger than 0.65em */
   color: #6c757d;
   font-weight: 500;
 }
 
 .duration-value {
-  font-size: 0.75em;
+  font-size: 0.975em; /* 30% larger than 0.75em */
   font-weight: bold;
   color: #007bff;
   background: #e3f2fd;
   padding: 2px 6px;
   border-radius: 4px;
   display: inline-block;
+}
+
+/* Duration background colors based on due date status */
+.duration.before-due .duration-value {
+  background: #d4edda !important; /* Light Green - before due date */
+  color: #155724 !important;
+}
+
+.duration.due-today .duration-value {
+  background: #fff3cd !important; /* Yellow - due today */
+  color: #856404 !important;
+}
+
+.duration.overdue .duration-value {
+  background: #f8d7da !important; /* Light Red - overdue */
+  color: #721c24 !important;
+}
+
+.duration.no-due-date .duration-value {
+  background: #e2e3e5 !important; /* Light Gray - no due date */
+  color: #383d41 !important;
 }
 
 /* Responsive adjustments for smaller screens */
@@ -267,7 +364,7 @@
 }
 
 .dashboard-container.fullscreen .machine-name {
-  font-size: 0.75em !important;
+  font-size: 0.9em !important;
 }
 
 .dashboard-container.fullscreen .process-name {
@@ -312,6 +409,96 @@
 
 .dashboard-container.fullscreen .machine-status-line {
   gap: 1px !important;
+}
+
+/* Multi-process smaller text in fullscreen - smaller than base 0.55em */
+.dashboard-container.fullscreen .machine-card .process-cards-container.multi-process .process-card .time-label,
+.dashboard-container.fullscreen .machine-card .process-cards-container.multi-process .process-card .due-label,
+.dashboard-container.fullscreen .process-cards-container.multi-process .time-label,
+.dashboard-container.fullscreen .process-cards-container.multi-process .due-label {
+  font-size: 0.38em !important; /* Smaller labels in fullscreen */
+}
+
+.dashboard-container.fullscreen .machine-card .process-cards-container.multi-process .process-card .time-value,
+.dashboard-container.fullscreen .machine-card .process-cards-container.multi-process .process-card .due-value,
+.dashboard-container.fullscreen .process-cards-container.multi-process .time-value,
+.dashboard-container.fullscreen .process-cards-container.multi-process .due-value {
+  font-size: 0.42em !important; /* Smaller values in fullscreen */
+}
+
+/* Due date status colors in fullscreen mode */
+.dashboard-container.fullscreen .due-date.before-due .due-value {
+  color: #28a745 !important; /* Green - before due date */
+}
+
+.dashboard-container.fullscreen .due-date.due-today .due-value {
+  color: #ffc107 !important; /* Yellow - due today */
+}
+
+.dashboard-container.fullscreen .due-date.overdue .due-value {
+  color: #dc3545 !important; /* Red - overdue */
+}
+
+.dashboard-container.fullscreen .due-date.no-due-date .due-value {
+  color: #6c757d !important; /* Light Gray - no due date */
+}
+
+/* Duration background colors in fullscreen mode */
+.dashboard-container.fullscreen .duration.before-due .duration-value {
+  background: #d4edda !important; /* Light Green - before due date */
+  color: #155724 !important;
+}
+
+.dashboard-container.fullscreen .duration.due-today .duration-value {
+  background: #fff3cd !important; /* Yellow - due today */
+  color: #856404 !important;
+}
+
+.dashboard-container.fullscreen .duration.overdue .duration-value {
+  background: #f8d7da !important; /* Light Red - overdue */
+  color: #721c24 !important;
+}
+
+.dashboard-container.fullscreen .duration.no-due-date .duration-value {
+  background: #e2e3e5 !important; /* Light Gray - no due date */
+  color: #383d41 !important;
+}
+
+/* Fullscreen inline due date styling */
+.dashboard-container.fullscreen .due-label-inline {
+  font-size: 0.385em !important; /* 30% smaller than fullscreen time-label 0.55em */
+}
+
+.dashboard-container.fullscreen .due-value-inline {
+  font-size: 0.385em !important; /* 30% smaller than fullscreen time-value 0.55em */
+}
+
+/* Fullscreen inline due date status colors */
+.dashboard-container.fullscreen .due-date-inline.before-due .due-value-inline {
+  color: #28a745 !important;
+}
+
+.dashboard-container.fullscreen .due-date-inline.due-today .due-value-inline {
+  color: #ffc107 !important;
+}
+
+.dashboard-container.fullscreen .due-date-inline.overdue .due-value-inline {
+  color: #dc3545 !important;
+}
+
+.dashboard-container.fullscreen .due-date-inline.no-due-date .due-value-inline {
+  color: #6c757d !important;
+}
+
+/* Smaller text for jobs with multiple process cards */
+.process-cards-container.multi-process .time-label,
+.process-cards-container.multi-process .due-label {
+  font-size: 0.585em !important; /* 30% larger than 0.45em */
+}
+
+.process-cards-container.multi-process .time-value,
+.process-cards-container.multi-process .due-value {
+  font-size: 0.65em !important; /* 30% larger than 0.50em */
 }
 
 /* Very compact mode for 4+ process cards in fullscreen */
